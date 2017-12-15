@@ -1,0 +1,15 @@
+language: python
+python:
+  - '2.7'
+  - '3.3'
+  - pypy
+
+deploy:
+  provider: pypi
+  user: jpbe
+  password:
+    secure: MvA+y/4u29NC8vxlVJdf+6Gbb4XXmkrzVXt5iYb4BTnBvnPI3iIl0wzt23jrua9Zfn/+eDRsCe7f838Z0QVC6eXWfukLVICwc7KfzEu0xrvwXh5CNb11aEJwPl6Hqzb2+zjQ2DTHX/+2I64QX5bmn6y/v3tqR0QyJGptk3QdAD8OIGZiUGzwMy82MN76igbk2qqKZzticiceUfarqKr11gyxxzRwzE9wizP6SaInVjgQem09eSreyJ0aD5vxxhBqvPd2UzYkED1+x91Q6l/J121aujwiPc2wbAzKjXI+6Ry96hTOdPu1275JdDvro3jaXDCpEAhBNjJwfgMhmlQjUWptyRx9ze68NpxgBOKZUKPUsku6XMXtbKAM1jOSHn4TUKHEzva5eW/k03rjKWFuxv3/PJ1pcrCF2VzCPI/dLTa9MeTIOV/snWc6/1sOlpV3pkWB4HigKQqaFzOpepttAi6yR2xLVLmMh+8VA5mMl1rXDZNJ1/suT0+cT25JydVFdcCbygkkNY7nU9rGXRA3fdMIrpICkFBc5m1lkTFDCdNHywUp2PEkIf9JoxCFwXRKhfKfJtss4hxm5VLfJapjyWEaaCR+xR9mB+5HzIeOEiM82BsiyvNQ1WJqeVHZZ8tb/IOq8Ooqw7I/aHKJbc8DLfw9fOWt+Y4oz8DSXdAgsbQ=
+  on:
+    tags: true
+    distributions: sdist bdist_wheel
+    repo: jpbede/pydiscovergy

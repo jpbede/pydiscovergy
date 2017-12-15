@@ -2,7 +2,7 @@ import logging
 from requests_oauthlib import OAuth1Session
 import requests
 import json
-from urlparse import parse_qs
+import sys
 
 TIMEOUT = 10
 _LOGGER = logging.getLogger(__name__)
@@ -60,7 +60,13 @@ class PyDiscovergy:
             url = self._authorization_base_url + "?oauth_token=" + resource_owner_key + \
                   "&email=" + email + "&password=" + password
             response = requests.get(url, headers={}, timeout=TIMEOUT)
-            parsed_response = parse_qs(response.content.decode('utf-8'))
+            if sys.version_info >= (3,0):
+                from urllib.parse import parse_qs
+                parsed_response = parse_qs(response.content.decode('utf-8'))
+            else:
+                from urlparse import parse_qs
+                parsed_response = parse_qs(response.content.decode('utf-8'))
+
             verifier = parsed_response["oauth_verifier"][0]
             return verifier
 

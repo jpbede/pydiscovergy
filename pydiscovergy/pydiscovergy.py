@@ -133,8 +133,11 @@ class PyDiscovergy:
         """Get smart meters"""
 
         try:
-            return self._discovergy_oauth.get(self._base_url + "/meters")
-
+            response = self._discovergy_oauth.get(self._base_url + "/meters")
+            if response:
+                return json.loads(response.content.decode("utf-8"))
+            else:
+                return False
         except Exception as exception_instance:
             _LOGGER.error("Exception: " + str(exception_instance))
             return False
@@ -143,8 +146,11 @@ class PyDiscovergy:
         """Get devices by meter id"""
 
         try:
-            return self._discovergy_oauth.get(self._base_url + "/devices?meterId=" + str(meter_id))
-
+            response = self._discovergy_oauth.get(self._base_url + "/devices?meterId=" + str(meter_id))
+            if response:
+                return json.loads(response.content.decode("utf-8"))
+            else:
+                return False
         except Exception as exception_instance:
             _LOGGER.error("Exception: " + str(exception_instance))
             return False
@@ -153,8 +159,11 @@ class PyDiscovergy:
         """Get last reading for meter"""
 
         try:
-            return self._discovergy_oauth.get(self._base_url + "/last_reading?meterId=" + str(meter_id))
-
+            response = self._discovergy_oauth.get(self._base_url + "/last_reading?meterId=" + str(meter_id))
+            if response:
+                return json.loads(response.content.decode("utf-8"))
+            else:
+                return False
         except Exception as exception_instance:
             _LOGGER.error("Exception: " + str(exception_instance))
             return False

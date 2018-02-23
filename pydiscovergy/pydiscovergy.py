@@ -3,6 +3,7 @@ from requests_oauthlib import OAuth1Session
 import requests
 import json
 import sys
+from models import Meter
 
 TIMEOUT = 10
 _LOGGER = logging.getLogger(__name__)
@@ -11,7 +12,10 @@ _LOGGER = logging.getLogger(__name__)
 class PyDiscovergy:
 
     def __init__(self, app_name):
-        """Initialize the Python Discovergy class."""
+        """
+        Initialize the Python Discovergy class.
+        :param app_name: App name for OAuth process
+        """
 
         self._app_name = app_name
         self._username = ""
@@ -130,10 +134,31 @@ class PyDiscovergy:
             return True
 
     def get_meters(self):
-        """Get smart meters"""
+        """
+        Get smart meters
+        :rtype: list[models.Meter]
+        """
 
         try:
             response = self._discovergy_oauth.get(self._base_url + "/meters")
+            if response:
+                meters_response = json.loads(response.content.decode("utf-8"))
+                meters = []
+                for mr in meters_response:
+                    meter = Meter(**mr)
+                    meters.append(meter)
+                return meters
+            else:
+                return []
+        except Exception as exception_instance:
+            _LOGGER.error("Exception: " + str(exception_instance))
+            return []
+
+    def get_fieldnames_for_meter(self, meter_id):
+        """Get field names for meter id"""
+
+        try:
+            response = self._discovergy_oauth.get(self._base_url + "/field_names?meterId=" + str(meter_id))
             if response:
                 return json.loads(response.content.decode("utf-8"))
             else:

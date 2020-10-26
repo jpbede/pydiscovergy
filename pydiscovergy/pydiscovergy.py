@@ -1,9 +1,10 @@
+#https://github.com/jpbede/pydiscovergy.git
+
 import logging
 from requests_oauthlib import OAuth1Session
 import requests
 import json
 import sys
-from models import Meter
 
 TIMEOUT = 10
 _LOGGER = logging.getLogger(__name__)
@@ -12,10 +13,7 @@ _LOGGER = logging.getLogger(__name__)
 class PyDiscovergy:
 
     def __init__(self, app_name):
-        """
-        Initialize the Python Discovergy class.
-        :param app_name: App name for OAuth process
-        """
+        """Initialize the Python Discovergy class."""
 
         self._app_name = app_name
         self._username = ""
@@ -134,31 +132,10 @@ class PyDiscovergy:
             return True
 
     def get_meters(self):
-        """
-        Get smart meters
-        :rtype: list[models.Meter]
-        """
+        """Get smart meters"""
 
         try:
             response = self._discovergy_oauth.get(self._base_url + "/meters")
-            if response:
-                meters_response = json.loads(response.content.decode("utf-8"))
-                meters = []
-                for mr in meters_response:
-                    meter = Meter(**mr)
-                    meters.append(meter)
-                return meters
-            else:
-                return []
-        except Exception as exception_instance:
-            _LOGGER.error("Exception: " + str(exception_instance))
-            return []
-
-    def get_fieldnames_for_meter(self, meter_id):
-        """Get field names for meter id"""
-
-        try:
-            response = self._discovergy_oauth.get(self._base_url + "/field_names?meterId=" + str(meter_id))
             if response:
                 return json.loads(response.content.decode("utf-8"))
             else:
@@ -187,6 +164,81 @@ class PyDiscovergy:
             response = self._discovergy_oauth.get(self._base_url + "/last_reading?meterId=" + str(meter_id))
             if response:
                 return json.loads(response.content.decode("utf-8"))
+            else:
+                return False
+        except Exception as exception_instance:
+            _LOGGER.error("Exception: " + str(exception_instance))
+            return False
+
+    def get_field_names(self, meter_id):
+        """Return all available measurement field names for the specified meter"""
+        try:
+            response = self._discovergy_oauth.get(self._base_url + "/field_names?meterId=" + str(meter_id))
+            if response:
+                return json.loads(response.content.decode("utf-8"))
+            else:
+                return False
+        except Exception as exception_instance:
+            _LOGGER.error("Exception: " + str(exception_instance))
+            return False
+
+    def get_readings(self, meter_id, starttime: int, endtime: int, resolution: str,
+                     fields: str = "field_names",
+                     disaggregation: bool = False,
+                     each: bool = False):
+        """Return the measurements for the specified meter in the specified time interval
+
+        each: Return data from the virtual meter itself (false) or all its sub-meters (true). Only applies if meterId refers to a virtual meter
+        disaggregation:  Include load disaggregation as pseudo-measurement fields, if available. Only applies if raw resolution is selected
+        Time distance between returned readings.
+        Possible values (resolution): max time span
+        raw:                1 day
+        three_minutes:      10 days
+        fifteen_minutes:    31 days
+        one_hour:           93 days
+        one_day:            10 years
+        one_week:	        20 years
+        one_month:	        50 years
+        one_year:	        100 years
+
+        starttime: as unix time stamp in miliseconds
+        endtime: as unix time stamp in miliseconds
+        fields: comma separated list of fields (get fields data from get_fields function) or put field_names to get
+        all available values
+        """
+        fieldvariable = "&field_names" if fields == "field_names" else "&fields=" + str(fields)
+        endtimevariable = "" if endtime == None else "&to=" + str(int(endtime))
+        resolutionvariable = "" if resolution == None else "&resolution=" + str(resolution)
+        disaggregationvariable = "&disaggregation=" + str(disaggregation)
+        eachvariable = "&each=" + str(each)
+
+        try:
+            request = self._base_url + "/readings?meterId=" + str(meter_id) + fieldvariable + "&from="+ str(int(
+                starttime)) + endtimevariable + resolutionvariable + disaggregationvariable + eachvariable
+            response = self._discovergy_oauth.get(request)
+            print(request, "\n", response)
+            if response:
+                return json.loads(response.content.decode("utf-8"))
+            else:
+                return False
+        except Exception as exception_instance:
+            _LOGGER.error("Exception: " + str(exception_instance))
+            return False
+
+    def get_statistics(self, meter_id: str, starttime: int, endtime: int, fields = "field_names"):
+        """Return various statistics calculated over all measurements for the specified meter in the specified time interval
+
+        field_names: default value which gives out stats for all available fields
+        carry out get_fields command to get all available field options for the specific meter
+        enter start- and endtime as time in miliseconds"""
+        fieldvariable = "&field_names" if fields == "field_names" else "&fields=" + str(fields)
+        endtimevariable = "" if endtime == None else "&to=" + str(int(endtime))
+        try:
+            request= self._base_url + "/statistics?meterId=" + str(meter_id) + fieldvariable + "&from=" + str(
+                int(starttime)) + endtimevariable
+            response = self._discovergy_oauth.get(request)
+            if response:
+                return json.loads(response.content.decode("utf-8")), request, response
             else:
                 return False
         except Exception as exception_instance:

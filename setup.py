@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='pydiscovergy',
-    version='0.0.4',
+    version='0.1.0',
     packages=['pydiscovergy'],
     url='https://github.com/jpbede/pydiscovergy',
     license='MIT',

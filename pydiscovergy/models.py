@@ -1,4 +1,6 @@
 class ConsumerToken:
+    """Represents a consumer token pair"""
+
     def __init__(self, key, secret):
         self.key = key
         self.secret = secret
@@ -8,6 +10,10 @@ class RequestToken:
     def __init__(self, token, token_secret):
         self.token = token
         self.token_secret = token_secret
+
+
+class AccessToken(RequestToken):
+    """Represents a access token pair"""
 
 
 class Meter:
@@ -31,6 +37,7 @@ class Location:
         self.zip = zip
         self.street_number = streetNumber
         self.country = country
+
 
 class Reading:
     def __init__(self, time, values):

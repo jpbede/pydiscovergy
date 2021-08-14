@@ -1,145 +1,184 @@
-import asyncio
+from __future__ import annotations
+
 import json
 import logging
 from urllib.parse import parse_qs
 
-import requests
-from requests_oauthlib import OAuth1Session
+import httpx
+from authlib.integrations.httpx_client import AsyncOAuth1Client
 
 from .const import (API_ACCESS_TOKEN, API_AUTHORIZATION, API_BASE,
                     API_CONSUMER_TOKEN, API_REQUEST_TOKEN, DEFAULT_TIMEOUT)
-from .error import HTTPError, InvalidLogin
-from .models import ConsumerToken, Meter, Reading, RequestToken
-
-_LOGGER = logging.getLogger(__name__)
-
-
-async def _run_in_executor(func, *args):
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(None, func, *args)
+from .error import AccessTokenExpired, HTTPError, InvalidLogin, MissingToken
+from .models import AccessToken, ConsumerToken, Meter, Reading, RequestToken
 
 
 class Discovergy:
 
-    def __init__(self, app_name, email, password,
-                 timeout=DEFAULT_TIMEOUT, consumer_token=None):
+    def __init__(self, app_name: str = "pydicovergy",
+                 consumer_token: ConsumerToken = None,
+                 access_token: AccessToken = None,
+                 timeout: int = DEFAULT_TIMEOUT):
         """Initialize the Python Discovergy class."""
         self.app_name = app_name
-        self.email = email
-        self.password = password
-
         self._timeout = timeout
         self.consumer_token = consumer_token
+        self.access_token = access_token
 
-        self._discovergy_oauth = None
-
-    async def fetch_consumer_token(self) -> ConsumerToken:
+    async def _fetch_consumer_token(self) -> ConsumerToken:
         """Fetches consumer token for app name"""
-        consumer_response = await _run_in_executor(
-            lambda: requests.post(API_CONSUMER_TOKEN, data={"client": self.app_name}, headers={}, timeout=self._timeout)
-        )
+        async with httpx.AsyncClient() as client:
+            try:
+                consumer_response = await client.post(url=API_CONSUMER_TOKEN,
+                                                      data={"client": self.app_name},
+                                                      headers={},
+                                                      timeout=self._timeout)
+                consumer_response.raise_for_status()
 
-        if consumer_response.status_code != 200:
-            raise HTTPError(consumer_response.content)
+                consumer_tokens = json.loads(consumer_response.content.decode("utf-8"))
+                self.consumer_token = ConsumerToken(consumer_tokens["key"], consumer_tokens["secret"])
+                return self.consumer_token
+            except httpx.RequestError as exc:
+                raise HTTPError from exc
+            except httpx.HTTPStatusError as exc:
+                if exc.response.status_code == 400:
+                    raise AccessTokenExpired from exc
+                else:
+                    raise HTTPError from exc
 
-        consumer_tokens = json.loads(consumer_response.content.decode("utf-8"))
-        self.consumer_token = ConsumerToken(consumer_tokens["key"], consumer_tokens["secret"])
-
-        return self.consumer_token
-
-    async def fetch_request_token(self) -> RequestToken:
+    async def _fetch_request_token(self) -> RequestToken:
         """Fetch request token"""
+        async with AsyncOAuth1Client(client_id=self.consumer_token.key,
+                                     client_secret=self.consumer_token.secret) as client:
+            try:
+                oauth_token_response = await client.fetch_request_token(API_REQUEST_TOKEN)
+                return RequestToken(oauth_token_response.get('oauth_token'),
+                                    oauth_token_response.get('oauth_token_secret'))
+            except httpx.RequestError as exc:
+                raise HTTPError from exc
+            except httpx.HTTPStatusError as exc:
+                if exc.response.status_code == 400:
+                    raise AccessTokenExpired from exc
+                else:
+                    raise HTTPError from exc
 
-        request_token_oauth = OAuth1Session(self.consumer_token.key,
-                                            client_secret=self.consumer_token.secret,
-                                            callback_uri='oob')
-        oauth_token_response = await _run_in_executor(request_token_oauth.fetch_request_token, API_REQUEST_TOKEN)
-
-        return RequestToken(oauth_token_response.get('oauth_token'), oauth_token_response.get('oauth_token_secret'))
-
-    async def authorize_request_token(self, request_token):
+    async def _authorize_request_token(self, email: str, password: str, request_token: str):
         """Authorize request token for account"""
+        async with httpx.AsyncClient() as client:
+            try:
+                url = API_AUTHORIZATION + "?oauth_token=" + request_token + \
+                      "&email=" + email + "&password=" + password
+                response = await client.get(url)
+                response.raise_for_status()
 
-        url = API_AUTHORIZATION + "?oauth_token=" + request_token + \
-              "&email=" + self.email + "&password=" + self.password
-        response = await _run_in_executor(lambda: requests.get(url, headers={}, timeout=self._timeout))
+                parsed_response = parse_qs(response.content.decode('utf-8'))
 
-        if response.status_code == 403:
-            raise InvalidLogin(response.content)
-        elif response.status_code != 200:
-            raise HTTPError(response.content)
+                verifier = parsed_response["oauth_verifier"][0]
+                return verifier
+            except httpx.RequestError as exc:
+                raise HTTPError from exc
+            except httpx.HTTPStatusError as exc:
+                if exc.response.status_code == 400:
+                    raise InvalidLogin from exc
+                else:
+                    raise HTTPError from exc
 
-        parsed_response = parse_qs(response.content.decode('utf-8'))
-
-        verifier = parsed_response["oauth_verifier"][0]
-        return verifier
-
-    async def fetch_access_token(self, request_token, request_token_secret, verifier) -> RequestToken:
+    async def _fetch_access_token(self, request_token, request_token_secret, verifier) -> AccessToken:
         """Fetch access token"""
+        async with AsyncOAuth1Client(client_id=self.consumer_token.key,
+                                     client_secret=self.consumer_token.secret,
+                                     token=request_token,
+                                     token_secret=request_token_secret) as client:
+            try:
+                access_token_response = await client.fetch_access_token(API_ACCESS_TOKEN, verifier)
+                return AccessToken(access_token_response.get('oauth_token'),
+                                   access_token_response.get('oauth_token_secret'))
+            except httpx.RequestError as exc:
+                raise HTTPError from exc
+            except httpx.HTTPStatusError as exc:
+                if exc.response.status_code == 400:
+                    raise AccessTokenExpired from exc
+                else:
+                    raise HTTPError from exc
 
-        access_token_oauth = OAuth1Session(self.consumer_token.key,
-                                           client_secret=self.consumer_token.secret,
-                                           resource_owner_key=request_token,
-                                           resource_owner_secret=request_token_secret,
-                                           verifier=verifier)
-        oauth_tokens = await _run_in_executor(access_token_oauth.fetch_access_token, API_ACCESS_TOKEN)
-
-        return RequestToken(oauth_tokens.get('oauth_token'), oauth_tokens.get('oauth_token_secret'))
-
-    async def login(self, access_token: RequestToken = None) -> RequestToken:
+    async def login(self, email: str, password: str) -> tuple[AccessToken, ConsumerToken]:
         """Do the auth workflow"""
 
-        # when we already have both token pairs we can already setup a OAuth1 session and skip all other steps
-        if access_token is not None and self.consumer_token is not None:
-            self._discovergy_oauth = OAuth1Session(self.consumer_token.key,
-                                                   client_secret=self.consumer_token.secret,
-                                                   resource_owner_key=access_token.token,
-                                                   resource_owner_secret=access_token.token_secret)
-            return access_token
+        # class already initialised with consumer and access token so we don't need to request one
+        if self.consumer_token is not None and self.access_token is not None:
+            return self.access_token, self.consumer_token
 
-        # check if we've already a consumer token if not request one
+        # no access token and consumer token were supplied so we need to do the auth workflow
+        # first fetch a consumer token
+        await self._fetch_consumer_token()
+
+        # then fetch a temporarily request token
+        temp_request_token = await self._fetch_request_token()
+
+        # authorize the temporarily request token with email and password
+        verifier = await self._authorize_request_token(email=email,
+                                                       password=password,
+                                                       request_token=temp_request_token.token)
+
+        # trade the authorized temporarily request token to an access token
+        self.access_token = await self._fetch_access_token(request_token=temp_request_token.token,
+                                                           request_token_secret=temp_request_token.token_secret,
+                                                           verifier=verifier)
+        return self.access_token, self.consumer_token
+
+    def _get_oauth_client_params(self):
+        """Return parameters for the OAuth1Client"""
         if self.consumer_token is None:
-            await self.fetch_consumer_token()
+            raise MissingToken("Consumer token is missing")
+        elif self.access_token is None:
+            raise MissingToken("Access token is missing")
 
-        request_tokens = await self.fetch_request_token()
-
-        verifier = await self.authorize_request_token(request_tokens.token)
-
-        access_token = await self.fetch_access_token(request_tokens.token, request_tokens.token_secret, verifier)
-
-        # Construct OAuth session with access token
-        self._discovergy_oauth = OAuth1Session(self.consumer_token.key,
-                                               client_secret=self.consumer_token.secret,
-                                               resource_owner_key=access_token.token,
-                                               resource_owner_secret=access_token.token_secret)
-
-        return access_token
+        return {
+            "client_id": self.consumer_token.key,
+            "client_secret": self.consumer_token.secret,
+            "token": self.access_token.token,
+            "token_secret": self.access_token.token_secret,
+        }
 
     async def get_meters(self):
         """Get smart meters"""
-        response = await _run_in_executor(self._discovergy_oauth.get, API_BASE + "/meters")
+        async with AsyncOAuth1Client(**self._get_oauth_client_params()) as client:
+            try:
+                response = await client.get(API_BASE + "/meters")
+                response.raise_for_status()
 
-        if response.status_code == 200:
-            result = []
-            for jsonMeter in json.loads(response.content.decode("utf-8")):
-                result.append(Meter(**jsonMeter))
-            return result
-        else:
-            raise HTTPError(response.content)
+                result = []
+                for jsonMeter in json.loads(response.content.decode("utf-8")):
+                    result.append(Meter(**jsonMeter))
+                return result
+            except httpx.RequestError as exc:
+                raise HTTPError from exc
+            except httpx.HTTPStatusError as exc:
+                if exc.response.status_code == 400:
+                    raise AccessTokenExpired from exc
+                else:
+                    raise HTTPError from exc
 
     async def get_last_reading(self, meter_id):
         """Get last reading for meter"""
-        response = await _run_in_executor(self._discovergy_oauth.get, API_BASE + "/last_reading?meterId=" + str(meter_id))
+        async with AsyncOAuth1Client(**self._get_oauth_client_params()) as client:
+            try:
+                response = await client.get(API_BASE + "/last_reading?meterId=" + str(meter_id))
+                response.raise_for_status()
 
-        if response.status_code == 200:
-            return Reading(**json.loads(response.content.decode("utf-8")))
-        else:
-            raise HTTPError(response.content)
+                return Reading(**json.loads(response.content.decode("utf-8")))
+            except httpx.RequestError as exc:
+                raise HTTPError from exc
+            except httpx.HTTPStatusError as exc:
+                if exc.response.status_code == 400:
+                    raise AccessTokenExpired from exc
+                else:
+                    raise HTTPError from exc
 
     async def get_readings(self, meter_id, starttime: int, endtime: int = 0, resolution: str = "",
-                     fields: str = "field_names",
-                     disaggregation: bool = False,
-                     each: bool = False):
+                           fields: str = "field_names",
+                           disaggregation: bool = False,
+                           each: bool = False):
         """Return the measurements for the specified meter in the specified time interval
 
         each: Return data from the virtual meter itself (false) or all its sub-meters (true). Only applies if meterId refers to a virtual meter
@@ -170,34 +209,55 @@ class Discovergy:
 
         request = API_BASE + "/readings?meterId=" + str(meter_id) + fieldvariable + "&from=" + str(
             starttime) + endtimevariable + resolutionvariable + disaggregationvariable + eachvariable
-        response = await _run_in_executor(self._discovergy_oauth.get, request)
 
-        if response.status_code == 200:
-            result = []
-            for jsonReading in json.loads(response.content.decode("utf-8")):
-                result.append(Reading(**jsonReading))
+        async with AsyncOAuth1Client(**self._get_oauth_client_params()) as client:
+            try:
+                response = await client.get(request)
+                response.raise_for_status()
 
-            return result
-        else:
-            raise HTTPError(response.content)
+                result = []
+                for jsonReading in json.loads(response.content.decode("utf-8")):
+                    result.append(Reading(**jsonReading))
+                return result
+            except httpx.RequestError as exc:
+                raise HTTPError from exc
+            except httpx.HTTPStatusError as exc:
+                if exc.response.status_code == 400:
+                    raise AccessTokenExpired from exc
+                else:
+                    raise HTTPError from exc
 
     async def get_field_names(self, meter_id):
         """Return all available measurement field names for the specified meter"""
-        response = await _run_in_executor(self._discovergy_oauth.get, API_BASE + "/field_names?meterId=" + str(meter_id))
+        async with AsyncOAuth1Client(**self._get_oauth_client_params()) as client:
+            try:
+                response = await client.get(API_BASE + "/field_names?meterId=" + str(meter_id))
+                response.raise_for_status()
 
-        if response.status_code == 200:
-            return json.loads(response.content.decode("utf-8"))
-        else:
-            raise HTTPError(response.content)
+                return json.loads(response.content.decode("utf-8"))
+            except httpx.RequestError as exc:
+                raise HTTPError from exc
+            except httpx.HTTPStatusError as exc:
+                if exc.response.status_code == 400:
+                    raise AccessTokenExpired from exc
+                else:
+                    raise HTTPError from exc
 
     async def get_devices_for_meter(self, meter_id):
         """Get devices by meter id"""
-        response = await _run_in_executor(self._discovergy_oauth.get, API_BASE + "/devices?meterId=" + str(meter_id))
+        async with AsyncOAuth1Client(**self._get_oauth_client_params()) as client:
+            try:
+                response = await client.get(API_BASE + "/devices?meterId=" + str(meter_id))
+                response.raise_for_status()
 
-        if response.status_code == 200:
-            return json.loads(response.content.decode("utf-8"))
-        else:
-            raise HTTPError(response.content)
+                return json.loads(response.content.decode("utf-8"))
+            except httpx.RequestError as exc:
+                raise HTTPError from exc
+            except httpx.HTTPStatusError as exc:
+                if exc.response.status_code == 400:
+                    raise AccessTokenExpired from exc
+                else:
+                    raise HTTPError from exc
 
     async def get_statistics(self, meter_id: str, starttime: int, endtime: int = 0, fields="field_names"):
         """Return various statistics calculated over all measurements for the specified meter in the specified time interval
@@ -208,10 +268,19 @@ class Discovergy:
         fieldvariable = "&field_names" if fields == "field_names" else "&fields=" + str(fields)
         endtimevariable = "" if endtime == 0 else "&to=" + str(endtime)
 
-        request = API_BASE + "/statistics?meterId=" + str(meter_id) + fieldvariable + "&from=" + str(starttime) + endtimevariable
-        response = await _run_in_executor(self._discovergy_oauth.get, request)
+        request = API_BASE + "/statistics?meterId=" + str(meter_id) + fieldvariable + "&from=" + str(
+            starttime) + endtimevariable
 
-        if response.status_code == 200:
-            return json.loads(response.content.decode("utf-8")), request, response
-        else:
-            raise HTTPError(response.content)
+        async with AsyncOAuth1Client(**self._get_oauth_client_params()) as client:
+            try:
+                response = await client.get(API_BASE + "/field_names?meterId=" + str(meter_id))
+                response.raise_for_status()
+
+                return json.loads(response.content.decode("utf-8")), request, response
+            except httpx.RequestError as exc:
+                raise HTTPError from exc
+            except httpx.HTTPStatusError as exc:
+                if exc.response.status_code == 400:
+                    raise AccessTokenExpired from exc
+                else:
+                    raise HTTPError from exc

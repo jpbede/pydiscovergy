@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-import logging
+from typing import Union
 from urllib.parse import parse_qs
 
 import httpx
@@ -41,8 +41,8 @@ class Discovergy:
             except httpx.RequestError as exc:
                 raise HTTPError from exc
             except httpx.HTTPStatusError as exc:
-                if exc.response.status_code == 400:
-                    raise AccessTokenExpired from exc
+                if exc.response.status_code == 401:
+                    raise AccessTokenExpired(exc)
                 else:
                     raise HTTPError from exc
 
@@ -57,7 +57,7 @@ class Discovergy:
             except httpx.RequestError as exc:
                 raise HTTPError from exc
             except httpx.HTTPStatusError as exc:
-                if exc.response.status_code == 400:
+                if exc.response.status_code == 401:
                     raise AccessTokenExpired from exc
                 else:
                     raise HTTPError from exc
@@ -78,7 +78,7 @@ class Discovergy:
             except httpx.RequestError as exc:
                 raise HTTPError from exc
             except httpx.HTTPStatusError as exc:
-                if exc.response.status_code == 400:
+                if exc.response.status_code == 401:
                     raise InvalidLogin from exc
                 else:
                     raise HTTPError from exc
@@ -96,12 +96,13 @@ class Discovergy:
             except httpx.RequestError as exc:
                 raise HTTPError from exc
             except httpx.HTTPStatusError as exc:
-                if exc.response.status_code == 400:
+                if exc.response.status_code == 401:
                     raise AccessTokenExpired from exc
                 else:
                     raise HTTPError from exc
 
-    async def login(self, email: str, password: str) -> tuple[AccessToken, ConsumerToken]:
+    async def login(self, email: str, password: str) -> Union[
+                    tuple[AccessToken, ConsumerToken], tuple[AccessToken, None]]:
         """Do the auth workflow"""
 
         # class already initialised with consumer and access token so we don't need to request one
@@ -154,7 +155,7 @@ class Discovergy:
             except httpx.RequestError as exc:
                 raise HTTPError from exc
             except httpx.HTTPStatusError as exc:
-                if exc.response.status_code == 400:
+                if exc.response.status_code == 401:
                     raise AccessTokenExpired from exc
                 else:
                     raise HTTPError from exc
@@ -170,7 +171,7 @@ class Discovergy:
             except httpx.RequestError as exc:
                 raise HTTPError from exc
             except httpx.HTTPStatusError as exc:
-                if exc.response.status_code == 400:
+                if exc.response.status_code == 401:
                     raise AccessTokenExpired from exc
                 else:
                     raise HTTPError from exc
@@ -181,9 +182,11 @@ class Discovergy:
                            each: bool = False):
         """Return the measurements for the specified meter in the specified time interval
 
-        each: Return data from the virtual meter itself (false) or all its sub-meters (true). Only applies if meterId refers to a virtual meter
+        each: Return data from the virtual meter itself (false) or all its sub-meters (true).
+        Only applies if meterId refers to a virtual meter
 
-        disaggregation:  Include load disaggregation as pseudo-measurement fields, if available. Only applies if raw resolution is selected
+        disaggregation:  Include load disaggregation as pseudo-measurement fields, if available.
+        Only applies if raw resolution is selected
 
         resolution: Time distance between returned readings. Possible values:
         raw:                1 day
@@ -199,7 +202,8 @@ class Discovergy:
 
         endtime: as unix time stamp in miliseconds
 
-        fields: comma separated list of fields (get fields data from get_fields function) or put field_names to get all available values
+        fields: comma separated list of fields (get fields data from get_fields function)
+        or put field_names to get all available values
         """
         fieldvariable = "&field_names" if fields == "field_names" else "&fields=" + str(fields)
         endtimevariable = "" if endtime == 0 else "&to=" + str(int(endtime))
@@ -222,7 +226,7 @@ class Discovergy:
             except httpx.RequestError as exc:
                 raise HTTPError from exc
             except httpx.HTTPStatusError as exc:
-                if exc.response.status_code == 400:
+                if exc.response.status_code == 401:
                     raise AccessTokenExpired from exc
                 else:
                     raise HTTPError from exc
@@ -238,7 +242,7 @@ class Discovergy:
             except httpx.RequestError as exc:
                 raise HTTPError from exc
             except httpx.HTTPStatusError as exc:
-                if exc.response.status_code == 400:
+                if exc.response.status_code == 401:
                     raise AccessTokenExpired from exc
                 else:
                     raise HTTPError from exc
@@ -254,13 +258,14 @@ class Discovergy:
             except httpx.RequestError as exc:
                 raise HTTPError from exc
             except httpx.HTTPStatusError as exc:
-                if exc.response.status_code == 400:
+                if exc.response.status_code == 401:
                     raise AccessTokenExpired from exc
                 else:
                     raise HTTPError from exc
 
     async def get_statistics(self, meter_id: str, starttime: int, endtime: int = 0, fields="field_names"):
-        """Return various statistics calculated over all measurements for the specified meter in the specified time interval
+        """Return various statistics calculated over all measurements for the specified meter
+         in the specified time interval
 
         field_names: default value which gives out stats for all available fields
         carry out get_fields command to get all available field options for the specific meter
@@ -280,7 +285,7 @@ class Discovergy:
             except httpx.RequestError as exc:
                 raise HTTPError from exc
             except httpx.HTTPStatusError as exc:
-                if exc.response.status_code == 400:
+                if exc.response.status_code == 401:
                     raise AccessTokenExpired from exc
                 else:
                     raise HTTPError from exc

@@ -44,7 +44,7 @@ class Discovergy:
                 if exc.response.status_code == 401:
                     raise AccessTokenExpired(exc)
                 else:
-                    raise HTTPError from exc
+                    raise HTTPError(f"Status {exc.response.status_code}: {exc.response.content}") from exc
 
     async def _fetch_request_token(self) -> RequestToken:
         """Fetch request token"""
@@ -60,7 +60,7 @@ class Discovergy:
                 if exc.response.status_code == 401:
                     raise AccessTokenExpired from exc
                 else:
-                    raise HTTPError from exc
+                    raise HTTPError(f"Status {exc.response.status_code}: {exc.response.content}") from exc
 
     async def _authorize_request_token(self, email: str, password: str, request_token: str):
         """Authorize request token for account"""
@@ -78,10 +78,10 @@ class Discovergy:
             except httpx.RequestError as exc:
                 raise HTTPError from exc
             except httpx.HTTPStatusError as exc:
-                if exc.response.status_code == 401:
+                if exc.response.status_code == 403:
                     raise InvalidLogin from exc
                 else:
-                    raise HTTPError from exc
+                    raise HTTPError(f"Status {exc.response.status_code}: {exc.response.content}") from exc
 
     async def _fetch_access_token(self, request_token, request_token_secret, verifier) -> AccessToken:
         """Fetch access token"""
@@ -99,7 +99,7 @@ class Discovergy:
                 if exc.response.status_code == 401:
                     raise AccessTokenExpired from exc
                 else:
-                    raise HTTPError from exc
+                    raise HTTPError(f"Status {exc.response.status_code}: {exc.response.content}") from exc
 
     async def login(self, email: str, password: str) -> Union[
                     tuple[AccessToken, ConsumerToken], tuple[AccessToken, None]]:
@@ -158,7 +158,7 @@ class Discovergy:
                 if exc.response.status_code == 401:
                     raise AccessTokenExpired from exc
                 else:
-                    raise HTTPError from exc
+                    raise HTTPError(f"Status {exc.response.status_code}: {exc.response.content}") from exc
 
     async def get_last_reading(self, meter_id):
         """Get last reading for meter"""
@@ -174,7 +174,7 @@ class Discovergy:
                 if exc.response.status_code == 401:
                     raise AccessTokenExpired from exc
                 else:
-                    raise HTTPError from exc
+                    raise HTTPError(f"Status {exc.response.status_code}: {exc.response.content}") from exc
 
     async def get_readings(self, meter_id, starttime: int, endtime: int = 0, resolution: str = "",
                            fields: str = "field_names",
@@ -229,7 +229,7 @@ class Discovergy:
                 if exc.response.status_code == 401:
                     raise AccessTokenExpired from exc
                 else:
-                    raise HTTPError from exc
+                    raise HTTPError(f"Status {exc.response.status_code}: {exc.response.content}") from exc
 
     async def get_field_names(self, meter_id):
         """Return all available measurement field names for the specified meter"""
@@ -245,7 +245,7 @@ class Discovergy:
                 if exc.response.status_code == 401:
                     raise AccessTokenExpired from exc
                 else:
-                    raise HTTPError from exc
+                    raise HTTPError(f"Status {exc.response.status_code}: {exc.response.content}") from exc
 
     async def get_devices_for_meter(self, meter_id):
         """Get devices by meter id"""
@@ -261,7 +261,7 @@ class Discovergy:
                 if exc.response.status_code == 401:
                     raise AccessTokenExpired from exc
                 else:
-                    raise HTTPError from exc
+                    raise HTTPError(f"Status {exc.response.status_code}: {exc.response.content}") from exc
 
     async def get_statistics(self, meter_id: str, starttime: int, endtime: int = 0, fields="field_names"):
         """Return various statistics calculated over all measurements for the specified meter
@@ -288,4 +288,4 @@ class Discovergy:
                 if exc.response.status_code == 401:
                     raise AccessTokenExpired from exc
                 else:
-                    raise HTTPError from exc
+                    raise HTTPError(f"Status {exc.response.status_code}: {exc.response.content}") from exc

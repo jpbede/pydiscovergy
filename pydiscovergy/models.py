@@ -1,46 +1,59 @@
-class ConsumerToken:
-    """Represents a consumer token pair"""
+"""Discovergy models."""
 
-    def __init__(self, key, secret):
+
+class ConsumerToken:
+    """Represents a consumer token pair."""
+
+    def __init__(self, key: str, secret: str) -> None:
         self.key = key
         self.secret = secret
 
 
 class RequestToken:
-    def __init__(self, token, token_secret):
+    """Represents a request token pair."""
+
+    def __init__(self, token: str, token_secret: str) -> None:
         self.token = token
         self.token_secret = token_secret
 
 
 class AccessToken(RequestToken):
-    """Represents a access token pair"""
+    """Represents a access token pair."""
 
 
 class Meter:
-    def __init__(self, serialNumber, type, measurementType, location, **kwargs):
-        """Represents a meter"""
+    """Represents a meter."""
+
+    def __init__(
+        self, serialNumber: str, measurementType: str, location: dict, **kwargs
+    ) -> None:
         self.serial_number = serialNumber
-        self.type = type
+        self.type = kwargs.get("type")
         self.measurement_type = measurementType
         self.location = Location(**location)
         self.additional = kwargs
 
-    def get_meter_id(self):
+    def get_meter_id(self) -> str:
+        """Get the unique meter id for subsequent API calls."""
         return self.type + "_" + self.serial_number
 
 
 class Location:
-    def __init__(self, city, street, zip, streetNumber, country):
-        """Represents a smart meter location"""
+    """Represents a smart meter location."""
+
+    def __init__(
+        self, city: str, street: str, streetNumber: str, country: str, **kwargs
+    ) -> None:
         self.city = city
         self.street = street
-        self.zip = zip
+        self.zip = kwargs.get("zip")
         self.street_number = streetNumber
         self.country = country
 
 
 class Reading:
-    def __init__(self, time, values):
-        """Represents a reading"""
+    """Represents a reading."""
+
+    def __init__(self, time: str, values: dict) -> None:
         self.time = time
         self.values = values

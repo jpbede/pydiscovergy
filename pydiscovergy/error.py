@@ -1,14 +1,21 @@
-class AccessTokenExpired(Exception):
+"""Discovergy errors."""
+
+
+class DiscovergyError(Exception):
+    """Generic error occurred in Discovergy package."""
+
+
+class AccessTokenExpired(DiscovergyError):
     """Expired access token exception"""
 
 
-class InvalidLogin(Exception):
+class InvalidLogin(DiscovergyError):
     """Invalid login exception"""
 
 
-class MissingToken(Exception):
+class MissingToken(DiscovergyError):
     """Token is missing exception"""
 
 
-class HTTPError(Exception):
+class HTTPError(DiscovergyError):
     """HTTP error"""

@@ -1,2 +1,8 @@
 authlib
 httpx
+pytest
+pytest-asyncio
+pytest-cov
+respx
+setuptools
+pylint

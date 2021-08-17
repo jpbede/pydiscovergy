@@ -16,23 +16,6 @@ jobs:
           pip install -r requirements.txt
           pylint pydiscovergy
 
-  codacy:
-    name: Codacy
-    runs-on: ubuntu-18.04
-    steps:
-      - name: Check out code from GitHub
-        uses: actions/checkout@v2.3.4
-      - name: Setup Python
-        uses: actions/setup-python@master
-        with:
-          python-version: 3.8
-      - name: Run Codacy Analysis CLI
-        uses: codacy/codacy-analysis-cli-action@master
-        with:
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          upload: true
-          max-allowed-issues: 2147483647
-
   pytest:
     runs-on: ubuntu-18.04
     steps:

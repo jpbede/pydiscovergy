@@ -28,10 +28,10 @@ jobs:
           python-version: 3.8
       - name: Run Codacy Analysis CLI
         uses: codacy/codacy-analysis-cli-action@master
-        #with:
-        #  project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-        #  upload: true
-        #  max-allowed-issues: 2147483647
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          upload: true
+          max-allowed-issues: 2147483647
 
   pytest:
     runs-on: ubuntu-18.04

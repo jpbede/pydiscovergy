@@ -1,10 +1,10 @@
-import pytest
 import httpx
+import pytest
 
 from pydiscovergy import Discovergy
 from pydiscovergy.const import API_BASE
-from pydiscovergy.models import ConsumerToken, RequestToken, Reading
 from pydiscovergy.error import HTTPError
+from pydiscovergy.models import ConsumerToken, Reading, RequestToken
 
 
 @pytest.mark.asyncio
@@ -12,11 +12,10 @@ async def test_login(mocked_login) -> None:
     di = Discovergy("test")
     (access_token, consumer_token) = await di.login("test@example.org", "test123abc")
 
-    bb = await di._fetch_consumer_token()
-
-    assert bb.key == "key123"
-    assert access_token.token == "akey123"
-    assert consumer_token.key == "key123"
+    assert access_token.token == "access_token"
+    assert access_token.token_secret == "access_token_secret"
+    assert consumer_token.key == "consumer_token"
+    assert consumer_token.secret == "consumer_token_secret"
 
 
 @pytest.mark.asyncio
@@ -89,7 +88,7 @@ async def test_get_meters(respx_mock, discovergy_mock, meter_json_mock) -> None:
 
     assert mock_req.called
     assert len(meters) == 1
-    assert meters[0].get_meter_id() == "EASYMETER_60671709"
+    assert meters[0].get_meter_id() == "EASYMETER_123456789"
 
 
 @pytest.mark.asyncio

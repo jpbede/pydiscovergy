@@ -5,6 +5,10 @@ class DiscovergyError(Exception):
     """Generic error occurred in Discovergy package."""
 
 
+class DiscovergyClientError(Exception):
+    """Error occurred when there was a client error in Discovergy package."""
+
+
 class AccessTokenExpired(DiscovergyError):
     """Expired access token exception"""
 

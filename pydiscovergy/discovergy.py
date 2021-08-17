@@ -22,6 +22,7 @@ from .error import (
     HTTPError,
     InvalidLogin,
     MissingToken,
+    DiscovergyClientError,
 )
 from .models import AccessToken, ConsumerToken, Meter, Reading, RequestToken
 
@@ -53,7 +54,7 @@ class Discovergy:
 
                 return json.loads(response.content.decode("utf-8"))
             except httpx.RequestError as exc:
-                raise HTTPError from exc
+                raise DiscovergyClientError from exc
             except httpx.HTTPStatusError as exc:
                 if exc.response.status_code == 401:
                     raise AccessTokenExpired from exc
@@ -80,7 +81,7 @@ class Discovergy:
                 )
                 return self.consumer_token
             except httpx.RequestError as exc:
-                raise HTTPError from exc
+                raise DiscovergyClientError from exc
             except httpx.HTTPStatusError as exc:
                 raise HTTPError(
                     f"Status {exc.response.status_code}: {exc.response.content}"
@@ -127,7 +128,7 @@ class Discovergy:
                 verifier = parsed_response["oauth_verifier"][0]
                 return verifier
             except httpx.RequestError as exc:
-                raise HTTPError from exc
+                raise DiscovergyClientError from exc
             except httpx.HTTPStatusError as exc:
                 if exc.response.status_code == 403:
                     # the credentials are invaild so raise the correct error
@@ -155,7 +156,7 @@ class Discovergy:
                     access_token_response.get("oauth_token_secret"),
                 )
             except httpx.RequestError as exc:
-                raise HTTPError from exc
+                raise DiscovergyClientError from exc
             except httpx.HTTPStatusError as exc:
                 raise HTTPError(
                     f"Status {exc.response.status_code}: {exc.response.content}"

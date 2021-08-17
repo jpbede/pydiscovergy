@@ -3,8 +3,29 @@ import pytest
 
 from pydiscovergy import Discovergy
 from pydiscovergy.const import API_BASE
-from pydiscovergy.error import HTTPError
+from pydiscovergy.error import DiscovergyError, HTTPError, DiscovergyClientError
 from pydiscovergy.models import ConsumerToken, Reading, RequestToken
+
+
+@pytest.mark.asyncio
+@pytest.mark.respx(base_url=API_BASE)
+async def test__get(respx_mock, discovergy_mock) -> None:
+    mock_req = respx_mock.get("/test").respond(json={"key": "value"})
+
+    resp = await discovergy_mock._get("/test")
+
+    assert mock_req.called
+    assert resp == {"key": "value"}
+
+    # test if error is raised when there is invalid json
+    with pytest.raises(DiscovergyError):
+        respx_mock.get("/test").respond(content='{"key": "value"')
+        await discovergy_mock._get("/test")
+
+    # check if DiscovergyError is raised when there was a client error
+    with pytest.raises(DiscovergyClientError):
+        respx_mock.get("/test").mock(side_effect=httpx.RequestError)
+        await discovergy_mock._get("/test")
 
 
 @pytest.mark.asyncio
@@ -33,7 +54,7 @@ async def test_fetch_consumer_token(respx_mock) -> None:
     assert consumer_token.key == "key123"
 
     # test when httpx.RequestError is raised
-    with pytest.raises(HTTPError):
+    with pytest.raises(DiscovergyClientError):
         mock_req2 = respx_mock.post("/oauth1/consumer_token").mock(
             side_effect=httpx.RequestError
         )
@@ -114,3 +135,17 @@ async def test_get_last_reading(respx_mock, discovergy_mock) -> None:
     assert isinstance(last_reading, Reading)
     assert len(last_reading.values) > 0
     assert last_reading.time != 0
+
+
+@pytest.mark.asyncio
+@pytest.mark.respx(base_url=API_BASE)
+async def test_get_devices_for_meter(respx_mock, discovergy_mock) -> None:
+    mock_req = respx_mock.get("/devices?meterId=EASYMETER_123456789").respond(
+        json=["DEVICE_1", "DEVICE_2", "DEVICE_3"]
+    )
+
+    devices = await discovergy_mock.get_devices_for_meter("EASYMETER_123456789")
+
+    assert mock_req.called
+    assert len(devices) == 3
+    assert devices == ["DEVICE_1", "DEVICE_2", "DEVICE_3"]

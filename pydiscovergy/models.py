@@ -1,7 +1,7 @@
 """Discovergy models."""
 
 
-class ConsumerToken:
+class ConsumerToken:  # pylint: disable=too-few-public-methods
     """Represents a consumer token pair."""
 
     def __init__(self, key: str, secret: str) -> None:
@@ -9,7 +9,7 @@ class ConsumerToken:
         self.secret = secret
 
 
-class RequestToken:
+class RequestToken:  # pylint: disable=too-few-public-methods
     """Represents a request token pair."""
 
     def __init__(self, token: str, token_secret: str) -> None:
@@ -17,11 +17,11 @@ class RequestToken:
         self.token_secret = token_secret
 
 
-class AccessToken(RequestToken):
+class AccessToken(RequestToken):  # pylint: disable=too-few-public-methods
     """Represents a access token pair."""
 
 
-class Meter:
+class Meter:  # pylint: disable=too-few-public-methods
     """Represents a meter."""
 
     def __init__(
@@ -38,7 +38,7 @@ class Meter:
         return self.type + "_" + self.serial_number
 
 
-class Location:
+class Location:  # pylint: disable=too-few-public-methods
     """Represents a smart meter location."""
 
     def __init__(
@@ -51,7 +51,7 @@ class Location:
         self.country = country
 
 
-class Reading:
+class Reading:  # pylint: disable=too-few-public-methods
     """Represents a reading."""
 
     def __init__(self, time: str, values: dict) -> None:

@@ -218,6 +218,7 @@ class Discovergy:
         response = await self._get("/last_reading?meterId=" + meter_id)
         return Reading(**response)
 
+    # pylint: disable=too-many-arguments
     async def get_readings(
         self,
         meter_id: str,

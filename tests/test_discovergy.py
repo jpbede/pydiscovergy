@@ -3,7 +3,7 @@ import pytest
 
 from pydiscovergy import Discovergy
 from pydiscovergy.const import API_BASE
-from pydiscovergy.error import DiscovergyError, HTTPError, DiscovergyClientError
+from pydiscovergy.error import DiscovergyError, HTTPError, DiscovergyClientError, AccessTokenExpired
 from pydiscovergy.models import ConsumerToken, Reading, RequestToken
 
 
@@ -22,9 +22,19 @@ async def test__get(respx_mock, discovergy_mock) -> None:
         respx_mock.get("/test").respond(content='{"key": "value"')
         await discovergy_mock._get("/test")
 
-    # check if DiscovergyError is raised when there was a client error
+    # check if DiscovergyClientError is raised when there was a client error
     with pytest.raises(DiscovergyClientError):
         respx_mock.get("/test").mock(side_effect=httpx.RequestError)
+        await discovergy_mock._get("/test")
+
+    # check if AccessTokenExpired is raised when there was a HTTP status 401
+    with pytest.raises(AccessTokenExpired):
+        respx_mock.get("/test").respond(status_code=401)
+        await discovergy_mock._get("/test")
+
+    # check if HTTPError is raised when there was a HTTP status 500
+    with pytest.raises(HTTPError):
+        respx_mock.get("/test").respond(status_code=500)
         await discovergy_mock._get("/test")
 
 

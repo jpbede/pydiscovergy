@@ -13,26 +13,26 @@ from pydiscovergy.models import AccessToken, ConsumerToken
 
 @pytest.fixture
 def mocked_login():
-    with respx.mock(base_url="https://foo.bar", assert_all_called=False) as respx_mock:
-        respx_mock.post(API_CONSUMER_TOKEN).respond(
-            json={"key": "consumer_token", "secret": "consumer_token_secret"}
+    with respx.mock(assert_all_called=False) as respx_mock:
+        respx_mock.post(url=API_CONSUMER_TOKEN, name="consumer_token").respond(
+            json={"key": "m_consumer_token", "secret": "m_consumer_token_secret"}
         )
 
         respx_mock.post(API_REQUEST_TOKEN).respond(
             json={
-                "oauth_token": "request_token",
-                "oauth_token_secret": "request_token_secret",
+                "oauth_token": "m_request_token",
+                "oauth_token_secret": "m_request_token_secret",
             }
         )
 
         respx_mock.get(API_AUTHORIZATION).respond(
-            content="oauth_verifier=i-am-a-verifier-string"
+            content="oauth_verifier=m_i-am-a-verifier-string"
         )
 
         respx_mock.post(API_ACCESS_TOKEN).respond(
             json={
-                "oauth_token": "access_token",
-                "oauth_token_secret": "access_token_secret",
+                "oauth_token": "m_access_token",
+                "oauth_token_secret": "m_access_token_secret",
             }
         )
 

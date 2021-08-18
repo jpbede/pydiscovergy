@@ -5,7 +5,7 @@ class DiscovergyError(Exception):
     """Generic error occurred in Discovergy package."""
 
 
-class DiscovergyClientError(Exception):
+class DiscovergyClientError(DiscovergyError):
     """Error occurred when there was a client error in Discovergy package."""
 
 

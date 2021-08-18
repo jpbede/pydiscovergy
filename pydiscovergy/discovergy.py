@@ -155,12 +155,8 @@ class Discovergy:
                     access_token_response.get("oauth_token"),
                     access_token_response.get("oauth_token_secret"),
                 )
-            except httpx.RequestError as exc:
-                raise DiscovergyClientError from exc
-            except httpx.HTTPStatusError as exc:
-                raise HTTPError(
-                    f"Status {exc.response.status_code}: {exc.response.content}"
-                ) from exc
+            except Exception as exc:
+                raise HTTPError(f"Request failed: {exc}") from exc
 
     async def login(
         self, email: str, password: str

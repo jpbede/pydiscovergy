@@ -25,8 +25,9 @@ class Meter:  # pylint: disable=too-few-public-methods
     """Represents a meter."""
 
     def __init__(
-        self, serialNumber: str, measurementType: str, location: dict, **kwargs
+        self, meterId: str, serialNumber: str, measurementType: str, location: dict, **kwargs
     ) -> None:
+        self.meter_id = meterId
         self.serial_number = serialNumber
         self.type = kwargs.get("type")
         self.measurement_type = measurementType
@@ -35,7 +36,7 @@ class Meter:  # pylint: disable=too-few-public-methods
 
     def get_meter_id(self) -> str:
         """Get the unique meter id for subsequent API calls."""
-        return self.type + "_" + self.serial_number
+        return self.meter_id
 
 
 class Location:  # pylint: disable=too-few-public-methods

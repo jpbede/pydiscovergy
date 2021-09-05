@@ -231,13 +231,13 @@ async def test_get_meters(respx_mock, discovergy_mock, meter_json_mock) -> None:
 
     assert mock_req.called
     assert len(meters) == 1
-    assert meters[0].get_meter_id() == "EASYMETER_123456789"
+    assert meters[0].get_meter_id() == "f8d610b7a8cc4e73939fa33b990ded54"
 
 
 @pytest.mark.asyncio
 @pytest.mark.respx(base_url=API_BASE)
 async def test_get_last_reading(respx_mock, discovergy_mock) -> None:
-    mock_req = respx_mock.get("/last_reading?meterId=EASYMETER_123456789").respond(
+    mock_req = respx_mock.get("/last_reading?meterId=f8d610b7a8cc4e73939fa33b990ded54").respond(
         json={
             "time": 1629195646015,
             "values": {
@@ -251,7 +251,7 @@ async def test_get_last_reading(respx_mock, discovergy_mock) -> None:
         }
     )
 
-    last_reading = await discovergy_mock.get_last_reading("EASYMETER_123456789")
+    last_reading = await discovergy_mock.get_last_reading("f8d610b7a8cc4e73939fa33b990ded54")
 
     assert mock_req.called
     assert isinstance(last_reading, Reading)
@@ -262,11 +262,11 @@ async def test_get_last_reading(respx_mock, discovergy_mock) -> None:
 @pytest.mark.asyncio
 @pytest.mark.respx(base_url=API_BASE)
 async def test_get_devices_for_meter(respx_mock, discovergy_mock) -> None:
-    mock_req = respx_mock.get("/devices?meterId=EASYMETER_123456789").respond(
+    mock_req = respx_mock.get("/devices?meterId=f8d610b7a8cc4e73939fa33b990ded54").respond(
         json=["DEVICE_1", "DEVICE_2", "DEVICE_3"]
     )
 
-    devices = await discovergy_mock.get_devices_for_meter("EASYMETER_123456789")
+    devices = await discovergy_mock.get_devices_for_meter("f8d610b7a8cc4e73939fa33b990ded54")
 
     assert mock_req.called
     assert len(devices) == 3

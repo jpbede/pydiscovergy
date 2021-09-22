@@ -29,8 +29,10 @@ class Meter:  # pylint: disable=too-few-public-methods
     ) -> None:
         self.meter_id = meterId
         self.serial_number = serialNumber
+        self.full_serial_number = kwargs.get("fullSerialNumber")
         self.type = kwargs.get("type")
         self.measurement_type = measurementType
+        self.load_profile_type = kwargs.get("loadProfileType")
         self.location = Location(**location)
         self.additional = kwargs
 

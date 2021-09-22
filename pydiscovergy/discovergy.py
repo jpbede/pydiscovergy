@@ -50,8 +50,6 @@ class Discovergy:
                 response = await client.get(API_BASE + path)
                 response.raise_for_status()
 
-                print(response.content.decode("utf-8"))
-
                 return json.loads(response.content.decode("utf-8"))
             except httpx.RequestError as exc:
                 raise DiscovergyClientError from exc

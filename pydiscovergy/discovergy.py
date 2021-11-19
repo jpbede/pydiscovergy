@@ -43,11 +43,11 @@ class Discovergy:
         self.consumer_token = consumer_token
         self.access_token = access_token
 
-    async def _get(self, path: str) -> dict | list:
+    async def _get(self, path: str, params: dict = None) -> dict | list:
         """Execute a GET request against the API."""
         async with AsyncOAuth1Client(**self._get_oauth_client_params()) as client:
             try:
-                response = await client.get(API_BASE + path)
+                response = await client.get(API_BASE + path, params=params)
                 response.raise_for_status()
 
                 return json.loads(response.content.decode("utf-8"))
@@ -109,16 +109,12 @@ class Discovergy:
         """Authorize request token for account"""
         async with httpx.AsyncClient() as client:
             try:
-                url = (
-                    API_AUTHORIZATION
-                    + "?oauth_token="
-                    + request_token
-                    + "&email="
-                    + email
-                    + "&password="
-                    + password
-                )
-                response = await client.get(url)
+                params = {
+                    'oauth_token': request_token,
+                    'email': email,
+                    'password': password
+                }
+                response = await client.get(API_AUTHORIZATION, params=params)
                 response.raise_for_status()
 
                 parsed_response = parse_qs(response.content.decode("utf-8"))
@@ -210,7 +206,7 @@ class Discovergy:
 
     async def get_last_reading(self, meter_id: str) -> Reading:
         """Get last reading for meter"""
-        response = await self._get("/last_reading?meterId=" + meter_id)
+        response = await self._get("/last_reading", params={"meterId": meter_id})
         return Reading(**response)
 
     # pylint: disable=too-many-arguments
@@ -270,11 +266,11 @@ class Discovergy:
 
     async def get_field_names(self, meter_id: str) -> list:
         """Return all available measurement field names for the specified meter."""
-        return await self._get("/field_names?meterId=" + meter_id)
+        return await self._get("/field_names", params={"meterId": meter_id})
 
     async def get_devices_for_meter(self, meter_id: str) -> list:
         """Get devices by meter id."""
-        return await self._get("/devices?meterId=" + meter_id)
+        return await self._get("/devices", params={"meterId": meter_id})
 
     async def get_statistics(
         self,

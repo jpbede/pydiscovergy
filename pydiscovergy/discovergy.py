@@ -110,9 +110,9 @@ class Discovergy:
         async with httpx.AsyncClient() as client:
             try:
                 params = {
-                    'oauth_token': request_token,
-                    'email': email,
-                    'password': password
+                    "oauth_token": request_token,
+                    "email": email,
+                    "password": password,
                 }
                 response = await client.get(API_AUTHORIZATION, params=params)
                 response.raise_for_status()

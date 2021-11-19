@@ -25,7 +25,12 @@ class Meter:  # pylint: disable=too-few-public-methods disable=too-many-instance
     """Represents a meter."""
 
     def __init__(
-        self, meterId: str, serialNumber: str, measurementType: str, location: dict, **kwargs
+        self,
+        meterId: str,
+        serialNumber: str,
+        measurementType: str,
+        location: dict,
+        **kwargs
     ) -> None:
         self.meter_id = meterId
         self.serial_number = serialNumber

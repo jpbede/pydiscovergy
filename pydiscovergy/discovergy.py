@@ -105,7 +105,7 @@ class Discovergy:
 
     async def _authorize_request_token(
         self, email: str, password: str, request_token: str
-    ) -> str:
+    ) -> str:  # pylint: disable=no-self-use
         """Authorize request token for account"""
         async with httpx.AsyncClient() as client:
             try:

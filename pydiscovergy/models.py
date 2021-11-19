@@ -21,7 +21,7 @@ class AccessToken(RequestToken):  # pylint: disable=too-few-public-methods
     """Represents a access token pair."""
 
 
-class Meter:  # pylint: disable=too-few-public-methods
+class Meter:  # pylint: disable=too-few-public-methods disable=too-many-instance-attributes
     """Represents a meter."""
 
     def __init__(

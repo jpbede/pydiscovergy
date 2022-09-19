@@ -1,2 +1,2 @@
 """Discovergy API."""
-from .discovergy import Discovergy
+from pydiscovergy.discovergy import Discovergy

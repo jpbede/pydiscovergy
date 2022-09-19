@@ -6,17 +6,17 @@ import json
 import httpx
 from httpx import AsyncClient
 
-from .authentication import BaseAuthentication
-from .const import (
+from pydiscovergy.authentication import BaseAuthentication
+from pydiscovergy.const import (
     API_BASE,
 )
-from .error import (
+from pydiscovergy.error import (
     AccessTokenExpired,
     DiscovergyError,
     HTTPError,
     DiscovergyClientError,
 )
-from .models import Meter, Reading
+from pydiscovergy.models import Meter, Reading
 
 
 class Discovergy:

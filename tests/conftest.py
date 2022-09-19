@@ -2,13 +2,15 @@ import pytest
 import respx
 
 import pydiscovergy
+from pydiscovergy.authentication.basicauth import BasicAuth
+from pydiscovergy.authentication.token import TokenAuth
 from pydiscovergy.const import (
     API_ACCESS_TOKEN,
     API_AUTHORIZATION,
     API_CONSUMER_TOKEN,
     API_REQUEST_TOKEN,
 )
-from pydiscovergy.models import AccessToken, ConsumerToken
+from pydiscovergy.models import ConsumerToken, AccessToken
 
 
 @pytest.fixture
@@ -42,10 +44,21 @@ def mocked_login():
 @pytest.fixture
 def discovergy_mock():
     instance = pydiscovergy.Discovergy(
-        "pytest",
-        consumer_token=ConsumerToken("consumer_token", "consumer_token_secret"),
-        access_token=AccessToken("access_token", "access_token_secret"),
+        email="demo@discovergy.com",
+        password="demo",
+        app_name="pytest",
+        authentication=BasicAuth(),
     )
+    yield instance
+
+
+@pytest.fixture
+def tokenauth_mock():
+    instance = TokenAuth(
+        consumer_token=ConsumerToken("key123", "secret123"),
+        access_token=AccessToken("access_token", "access_token_secret")
+    )
+    instance.app_name = "pytest"
     yield instance
 
 

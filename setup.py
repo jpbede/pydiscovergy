@@ -3,7 +3,7 @@ from setuptools import setup, find_namespace_packages
 setup(
     name='pydiscovergy',
     version='1.2.0',
-    packages=find_namespace_packages(include=['pydiscovergy.*']),
+    packages=find_namespace_packages(include=['pydiscovergy', 'pydiscovergy.*']),
     url='https://github.com/jpbede/pydiscovergy',
     license='MIT',
     author='Jan-Philipp Benecke',

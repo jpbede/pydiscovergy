@@ -3,11 +3,11 @@ import json
 from pprint import pprint
 
 import pydiscovergy
-from pydiscovergy.authentication import TokenAuth
+from pydiscovergy.authentication import BasicAuth
 
 
 async def main():
-    dis = pydiscovergy.Discovergy(email="demo@discovergy.com", password="demo", authentication=TokenAuth())
+    dis = pydiscovergy.Discovergy(email="demo@discovergy.com", password="demos", authentication=BasicAuth())
 
     meters = await dis.get_meters()
 

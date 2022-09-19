@@ -6,7 +6,7 @@ import json
 import httpx
 from httpx import AsyncClient
 
-from pydiscovergy.authentication import BaseAuthentication
+from pydiscovergy.authentication import BaseAuthentication, TokenAuth, BasicAuth
 from pydiscovergy.const import (
     API_BASE,
 )
@@ -14,7 +14,7 @@ from pydiscovergy.error import (
     AccessTokenExpired,
     DiscovergyError,
     HTTPError,
-    DiscovergyClientError,
+    DiscovergyClientError, InvalidLogin,
 )
 from pydiscovergy.models import Meter, Reading
 
@@ -51,8 +51,10 @@ class Discovergy:
             except httpx.RequestError as exc:
                 raise DiscovergyClientError from exc
             except httpx.HTTPStatusError as exc:
-                if exc.response.status_code == 401:
+                if exc.response.status_code == 401 and isinstance(self.authentication, TokenAuth):
                     raise AccessTokenExpired from exc
+                elif isinstance(self.authentication, BasicAuth):
+                    raise InvalidLogin from exc
                 raise HTTPError(
                     f"Request failed with status {exc.response.status_code}: {exc.response.content}"
                 ) from exc

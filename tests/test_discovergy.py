@@ -2,7 +2,7 @@ import httpx
 import pytest
 
 from pydiscovergy import Discovergy
-from pydiscovergy.authentication.token import TokenAuth
+from pydiscovergy.authentication import TokenAuth
 from pydiscovergy.const import API_BASE
 from pydiscovergy.error import (
     DiscovergyError,

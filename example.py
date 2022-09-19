@@ -3,7 +3,7 @@ import json
 from pprint import pprint
 
 import pydiscovergy
-from pydiscovergy.authentication.token import TokenAuth
+from pydiscovergy.authentication import TokenAuth
 
 
 async def main():

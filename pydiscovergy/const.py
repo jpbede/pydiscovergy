@@ -1,5 +1,7 @@
 """Discovergy constants."""
 
+DEFAULT_APP_NAME = "pydicovergy"
+
 DEFAULT_TIMEOUT = 10
 
 API_BASE = "https://api.discovergy.com/public/v1"

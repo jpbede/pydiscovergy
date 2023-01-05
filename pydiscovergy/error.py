@@ -1,4 +1,4 @@
-"""Discovergy errors."""
+"""Exceptions for Discovergy API."""
 
 
 class DiscovergyError(Exception):

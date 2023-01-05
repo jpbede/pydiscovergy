@@ -1,67 +1,67 @@
-"""Discovergy models."""
+"""Models for Discovergy API."""
+from dataclasses import dataclass, field
+from datetime import datetime
+
+from dataclasses_json import CatchAll, Undefined, config, dataclass_json
 
 
-class ConsumerToken:  # pylint: disable=too-few-public-methods
+@dataclass
+class ConsumerToken:
     """Represents a consumer token pair."""
 
-    def __init__(self, key: str, secret: str) -> None:
-        self.key = key
-        self.secret = secret
+    key: str
+    secret: str
 
 
-class RequestToken:  # pylint: disable=too-few-public-methods
+@dataclass
+class RequestToken:
     """Represents a request token pair."""
 
-    def __init__(self, token: str, token_secret: str) -> None:
-        self.token = token
-        self.token_secret = token_secret
+    token: str
+    token_secret: str
 
 
-class AccessToken(RequestToken):  # pylint: disable=too-few-public-methods
-    """Represents a access token pair."""
+@dataclass
+class AccessToken(RequestToken):
+    """Represents an access token pair."""
 
 
-class Meter:  # pylint: disable=too-few-public-methods disable=too-many-instance-attributes
-    """Represents a meter."""
-
-    def __init__(
-        self,
-        meterId: str,
-        serialNumber: str,
-        measurementType: str,
-        location: dict,
-        **kwargs
-    ) -> None:
-        self.meter_id = meterId
-        self.serial_number = serialNumber
-        self.full_serial_number = kwargs.get("fullSerialNumber")
-        self.type = kwargs.get("type")
-        self.measurement_type = measurementType
-        self.load_profile_type = kwargs.get("loadProfileType")
-        self.location = Location(**location)
-        self.additional = kwargs
-
-    def get_meter_id(self) -> str:
-        """Get the unique meter id for subsequent API calls."""
-        return self.meter_id
-
-
-class Location:  # pylint: disable=too-few-public-methods
+@dataclass_json
+@dataclass
+class Location:
     """Represents a smart meter location."""
 
-    def __init__(
-        self, city: str, street: str, streetNumber: str, country: str, **kwargs
-    ) -> None:
-        self.city = city
-        self.street = street
-        self.zip = kwargs.get("zip")
-        self.street_number = streetNumber
-        self.country = country
+    street: str
+    street_number: str = field(metadata=config(field_name="streetNumber"))
+    city: str
+    zip: int
+    country: str
 
 
-class Reading:  # pylint: disable=too-few-public-methods
-    """Represents a reading."""
+@dataclass_json
+@dataclass
+class Reading:
+    """Represents a reading of a smart meter."""
 
-    def __init__(self, time: str, values: dict) -> None:
-        self.time = time
-        self.values = values
+    time: datetime = field(
+        metadata=config(
+            encoder=lambda dt: int(dt.timestamp() * 1000),
+            decoder=lambda ts: datetime.fromtimestamp(ts / 1000),
+        )
+    )
+    values: dict
+
+
+@dataclass_json(undefined=Undefined.INCLUDE)
+@dataclass
+class Meter:
+    """Represents a smart meter."""
+
+    meter_id: str = field(metadata=config(field_name="meterId"))
+    serial_number: str = field(metadata=config(field_name="serialNumber"))
+    full_serial_number: str = field(metadata=config(field_name="fullSerialNumber"))
+    type: str = field(metadata=config(field_name="type"))
+    measurement_type: str = field(metadata=config(field_name="measurementType"))
+    load_profile_type: str = field(metadata=config(field_name="loadProfileType"))
+    location: Location
+    additional: CatchAll

@@ -1,20 +1,17 @@
 import asyncio
-import json
 from pprint import pprint
 
-import pydiscovergy
-from pydiscovergy.authentication import BasicAuth
+from pydiscovergy import Discovergy
 
 
 async def main():
-    dis = pydiscovergy.Discovergy(email="demo@discovergy.com", password="demos", authentication=BasicAuth())
-
-    meters = await dis.get_meters()
+    discovergy = Discovergy(email="demo@discovergy.com", password="demo")
+    meters = await discovergy.meters()
 
     for meter in meters:
-        pprint(meter)
-        if meter.additional.get("fullSerialNumber") == "7ELS8135823805":
-            reading = await dis.get_last_reading(meter.get_meter_id())
+        if meter.full_serial_number == "1ESY1161978584":
+            reading = await discovergy.meter_devices(meter.meter_id)
             pprint(reading)
+
 
 asyncio.run(main())

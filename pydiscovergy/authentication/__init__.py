@@ -1,3 +1,11 @@
-from pydiscovergy.authentication.base import BaseAuthentication
-from pydiscovergy.authentication.token import TokenAuth
-from pydiscovergy.authentication.basicauth import BasicAuth
+"""Base authentication module for Discovergy API."""
+
+from .base import BaseAuthentication
+from .basicauth import BasicAuth
+from .token import TokenAuth
+
+__all__ = [
+    "BaseAuthentication",
+    "TokenAuth",
+    "BasicAuth",
+]

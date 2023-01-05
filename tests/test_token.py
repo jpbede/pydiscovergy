@@ -1,10 +1,14 @@
 import httpx
 import pytest
 
-from pydiscovergy.authentication.token import TokenAuth
 from pydiscovergy.const import API_BASE
-from pydiscovergy.error import HTTPError, InvalidLogin, DiscovergyClientError, DiscovergyError
-from pydiscovergy.models import RequestToken, ConsumerToken
+from pydiscovergy.error import (
+    DiscovergyClientError,
+    DiscovergyError,
+    HTTPError,
+    InvalidLogin,
+)
+from pydiscovergy.models import ConsumerToken, RequestToken
 
 
 @pytest.mark.asyncio

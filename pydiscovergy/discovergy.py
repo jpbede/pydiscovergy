@@ -1,90 +1,82 @@
 """Discovergy API."""
 from __future__ import annotations
 
+from dataclasses import dataclass
 import json
 
-import httpx
-from httpx import AsyncClient
+from httpx import AsyncClient, HTTPStatusError, RequestError
 
-from pydiscovergy.authentication import BaseAuthentication, TokenAuth, BasicAuth
-from pydiscovergy.const import (
-    API_BASE,
-)
-from pydiscovergy.error import (
+from .authentication import BaseAuthentication, BasicAuth, TokenAuth
+from .const import API_BASE, DEFAULT_APP_NAME
+from .error import (
     AccessTokenExpired,
+    DiscovergyClientError,
     DiscovergyError,
     HTTPError,
-    DiscovergyClientError, InvalidLogin,
+    InvalidLogin,
 )
-from pydiscovergy.models import Meter, Reading
+from .models import Meter, Reading
 
 
+@dataclass
 class Discovergy:
     """Discovergy API."""
 
-    def __init__(
-            self,
-            email: str,
-            password: str,
-            authentication: BaseAuthentication,
-            app_name: str = "pydicovergy",
-            httpx_client: AsyncClient = None,
-    ) -> None:
-        """Initialize the Python Discovergy class."""
-        self.authentication = authentication
-        self.authentication.app_name = app_name
+    email: str
+    password: str
+    app_name: str = DEFAULT_APP_NAME
+    httpx_client: AsyncClient = None
+    authentication: BaseAuthentication = BasicAuth()
 
-        self.email = email
-        self.password = password
-        self.app_name = app_name
-        self.httpx_client = httpx_client
-
-    async def _get(self, path: str, params: dict = None) -> dict | list:
+    async def _get(self, path: str, params: dict = None) -> str:
         """Execute a GET request against the API."""
+        self.authentication.app_name = self.app_name
 
-        async with await self.authentication.get_client(self.email, self.password, self.httpx_client) as client:
+        async with await self.authentication.get_client(
+            self.email, self.password, self.httpx_client
+        ) as client:
             try:
                 response = await client.get(API_BASE + path, params=params)
                 response.raise_for_status()
 
                 return json.loads(response.content.decode("utf-8"))
-            except httpx.RequestError as exc:
+            except RequestError as exc:
                 raise DiscovergyClientError from exc
-            except httpx.HTTPStatusError as exc:
-                if exc.response.status_code == 401 and isinstance(self.authentication, TokenAuth):
+            except HTTPStatusError as exc:
+                if exc.response.status_code == 401 and isinstance(
+                    self.authentication, TokenAuth
+                ):
                     raise AccessTokenExpired from exc
-                elif isinstance(self.authentication, BasicAuth):
+                if exc.response.status_code == 401 and isinstance(
+                    self.authentication, BasicAuth
+                ):
                     raise InvalidLogin from exc
                 raise HTTPError(
-                    f"Request failed with status {exc.response.status_code}: {exc.response.content}"
+                    f"Request failed with status {exc.response.status_code}: "
+                    f"{exc.response.content}"
                 ) from exc
             except json.JSONDecodeError as exc:
                 raise DiscovergyError("Decoding failed: {exc}") from exc
 
-    async def get_meters(self) -> list[Meter]:
-        """Get smart meters"""
+    async def meters(self) -> tuple(list[Meter]):
+        """Get list of smart meters."""
         response = await self._get("/meters")
+        return Meter.schema().load(response, many=True)  # pylint: disable=no-member
 
-        result = []
-        for json_meter in response:
-            result.append(Meter(**json_meter))
-        return result
-
-    async def get_last_reading(self, meter_id: str) -> Reading:
+    async def meter_last_reading(self, meter_id: str) -> Reading:
         """Get last reading for meter"""
         response = await self._get("/last_reading", params={"meterId": meter_id})
-        return Reading(**response)
+        return Reading.from_dict(response)  # pylint: disable=no-member
 
-    # pylint: disable=too-many-arguments
-    async def get_readings(
-            self,
-            meter_id: str,
-            start_time: int,
-            end_time: int = 0,
-            resolution: str = "",
-            fields: list = None,
-            disaggregation: bool = False,
-            each: bool = False,
+    async def meter_readings(
+        self,
+        meter_id: str,
+        start_time: int,
+        end_time: int = 0,
+        resolution: str = "",
+        fields: list = None,
+        disaggregation: bool = False,
+        each: bool = False,
     ) -> list[Reading]:
         """Return the measurements for the specified meter in the specified time interval
 
@@ -125,25 +117,22 @@ class Discovergy:
             + str(each).lower()
         )
 
-        result = []
-        for json_reading in response:
-            result.append(Reading(**json_reading))
-        return result
+        return Reading.schema().load(response, many=True)  # pylint: disable=no-member
 
-    async def get_field_names(self, meter_id: str) -> list:
+    async def meter_field_names(self, meter_id: str) -> list:
         """Return all available measurement field names for the specified meter."""
         return await self._get("/field_names", params={"meterId": meter_id})
 
-    async def get_devices_for_meter(self, meter_id: str) -> list:
+    async def meter_devices(self, meter_id: str) -> list:
         """Get devices by meter id."""
         return await self._get("/devices", params={"meterId": meter_id})
 
-    async def get_statistics(
-            self,
-            meter_id: str,
-            start_time: int,
-            end_time: int = 0,
-            fields: list = None,
+    async def meter_statistics(
+        self,
+        meter_id: str,
+        start_time: int,
+        end_time: int = 0,
+        fields: list = None,
     ) -> dict | list:
         """Return various statistics calculated over all measurements for the specified meter
          in the specified time interval
@@ -153,12 +142,12 @@ class Discovergy:
         enter start- and end_time as time in miliseconds"""
 
         request = (
-                "/statistics?meterId="
-                + str(meter_id)
-                + ("&field_names" if fields is None else "&fields=" + ",".join(fields))
-                + "&from="
-                + str(start_time)
-                + ("" if end_time == 0 else "&to=" + str(end_time))
+            "/statistics?meterId="
+            + str(meter_id)
+            + ("&field_names" if fields is None else "&fields=" + ",".join(fields))
+            + "&from="
+            + str(start_time)
+            + ("" if end_time == 0 else "&to=" + str(end_time))
         )
 
         try:

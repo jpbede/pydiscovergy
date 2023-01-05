@@ -51,12 +51,12 @@ async def test_meters(respx_mock, discovergy_mock, meter_json_mock) -> None:
 
     assert mock_req.called
     assert len(meters) == 1
-    assert meters[0].get_meter_id() == "f8d610b7a8cc4e73939fa33b990ded54"
+    assert meters[0].meter_id == "f8d610b7a8cc4e73939fa33b990ded54"
 
 
 @pytest.mark.asyncio
 @pytest.mark.respx(base_url=API_BASE)
-async def test_last_meter_reading(respx_mock, discovergy_mock) -> None:
+async def test_meter_last_reading(respx_mock, discovergy_mock) -> None:
     mock_req = respx_mock.get(
         "/last_reading?meterId=f8d610b7a8cc4e73939fa33b990ded54"
     ).respond(
@@ -73,7 +73,7 @@ async def test_last_meter_reading(respx_mock, discovergy_mock) -> None:
         }
     )
 
-    last_reading = await discovergy_mock.last_meter_reading(
+    last_reading = await discovergy_mock.meter_last_reading(
         "f8d610b7a8cc4e73939fa33b990ded54"
     )
 

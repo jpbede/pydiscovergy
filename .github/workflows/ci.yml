@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 jobs:
   linting:
+    name: "Linting and formatting checks"
     runs-on: ubuntu-latest
     strategy:
       matrix:

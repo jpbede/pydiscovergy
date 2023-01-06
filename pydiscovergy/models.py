@@ -2,66 +2,57 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from dataclasses_json import CatchAll, Undefined, config, dataclass_json
+from dataclasses_json import CatchAll, LetterCase, Undefined, config, dataclass_json
+from marshmallow import fields
 
 
-@dataclass
-class ConsumerToken:
-    """Represents a consumer token pair."""
-
-    key: str
-    secret: str
-
-
-@dataclass
-class RequestToken:
-    """Represents a request token pair."""
-
-    token: str
-    token_secret: str
-
-
-@dataclass
-class AccessToken(RequestToken):
-    """Represents an access token pair."""
-
-
-@dataclass_json
-@dataclass
+@dataclass_json(letter_case=LetterCase.CAMEL)
+@dataclass(frozen=True)
 class Location:
     """Represents a smart meter location."""
 
     street: str
-    street_number: str = field(metadata=config(field_name="streetNumber"))
+    street_number: str
     city: str
     zip: int
     country: str
 
 
 @dataclass_json
-@dataclass
+@dataclass(frozen=True)
 class Reading:
     """Represents a reading of a smart meter."""
 
-    time: datetime = field(
+    time: datetime = field(metadata=config(mm_field=fields.DateTime("timestamp_ms")))
+    values: dict[str, float] = field(
         metadata=config(
-            encoder=lambda dt: int(dt.timestamp() * 1000),
-            decoder=lambda ts: datetime.fromtimestamp(ts / 1000),
+            mm_field=fields.Dict(keys=fields.String(), values=fields.Float())
         )
     )
-    values: dict
 
 
-@dataclass_json(undefined=Undefined.INCLUDE)
-@dataclass
+@dataclass_json
+@dataclass(frozen=True)
+class Statistic:
+    """Represents a meter statistic entry."""
+
+    count: int
+    minimum: float
+    maximum: float
+    mean: float
+    variance: float
+
+
+@dataclass_json(undefined=Undefined.INCLUDE, letter_case=LetterCase.CAMEL)
+@dataclass(frozen=True)
 class Meter:
     """Represents a smart meter."""
 
-    meter_id: str = field(metadata=config(field_name="meterId"))
-    serial_number: str = field(metadata=config(field_name="serialNumber"))
-    full_serial_number: str = field(metadata=config(field_name="fullSerialNumber"))
-    type: str = field(metadata=config(field_name="type"))
-    measurement_type: str = field(metadata=config(field_name="measurementType"))
-    load_profile_type: str = field(metadata=config(field_name="loadProfileType"))
+    meter_id: str
+    serial_number: str
+    full_serial_number: str
+    type: str
+    measurement_type: str
+    load_profile_type: str
     location: Location
     additional: CatchAll

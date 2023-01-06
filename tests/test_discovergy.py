@@ -108,7 +108,7 @@ async def test_meter_devices(respx_mock, discovergy_mock: Discovergy) -> None:
 async def test_meter_readings(respx_mock, discovergy_mock: Discovergy) -> None:
     params = {
         "meterId": "f8d610b7a8cc4e73939fa33b990ded54",
-        "from": "1673000674648",
+        "from": "1673004274648",
         "disaggregation": "false",
         "each": "false",
     }
@@ -153,7 +153,7 @@ async def test_meter_field_names(respx_mock, discovergy_mock: Discovergy) -> Non
 async def test_meter_statistics(respx_mock, discovergy_mock: Discovergy) -> None:
     params = {
         "meterId": "f8d610b7a8cc4e73939fa33b990ded54",
-        "from": "1673000674648",
+        "from": "1673004274648",
     }
 
     mock_req = respx_mock.get("/statistics", params=params).respond(

@@ -119,7 +119,7 @@ async def test_meter_readings(respx_mock, discovergy_mock: Discovergy) -> None:
 
     readings = await discovergy_mock.meter_readings(
         "f8d610b7a8cc4e73939fa33b990ded54",
-        datetime.datetime.utcfromtimestamp(1673004274648 / 1000),
+        datetime.datetime.fromtimestamp(1673004274648 / 1000),
     )
 
     assert mock_req.called == 1
@@ -162,7 +162,7 @@ async def test_meter_statistics(respx_mock, discovergy_mock: Discovergy) -> None
 
     statistics = await discovergy_mock.meter_statistics(
         "f8d610b7a8cc4e73939fa33b990ded54",
-        datetime.datetime.utcfromtimestamp(1673004274648 / 1000),
+        datetime.datetime.fromtimestamp(1673004274648 / 1000),
     )
 
     assert mock_req.called == 1

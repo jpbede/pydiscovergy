@@ -42,8 +42,8 @@ def mocked_login():
 @pytest.fixture
 def discovergy_mock():
     instance = pydiscovergy.Discovergy(
-        email="demo@discovergy.com",
-        password="demod",
+        email="example@example.com",
+        password="example",
     )
     yield instance
 

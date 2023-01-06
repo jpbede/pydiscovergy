@@ -1,6 +1,7 @@
 """Authentication module for token auth."""
 from __future__ import annotations
 
+from dataclasses import dataclass
 import json
 from urllib.parse import parse_qs
 
@@ -12,6 +13,7 @@ from ..const import (
     API_AUTHORIZATION,
     API_CONSUMER_TOKEN,
     API_REQUEST_TOKEN,
+    DEFAULT_APP_NAME,
 )
 from ..error import (
     DiscovergyClientError,
@@ -20,27 +22,45 @@ from ..error import (
     InvalidLogin,
     MissingToken,
 )
-from ..models import AccessToken, ConsumerToken, RequestToken
 from .base import BaseAuthentication
 
 
+@dataclass
+class ConsumerToken:
+    """Represents a consumer token pair."""
+
+    key: str
+    secret: str
+
+
+@dataclass
+class RequestToken:
+    """Represents a request token pair."""
+
+    token: str
+    token_secret: str
+
+
+@dataclass
+class AccessToken(RequestToken):
+    """Represents an access token pair."""
+
+
+@dataclass
 class TokenAuth(BaseAuthentication):
     """Authentication class for token auth."""
 
-    def __init__(
-        self, consumer_token: ConsumerToken = None, access_token: AccessToken = None
-    ):
-        """"""
-        self.consumer_token = consumer_token
-        self.access_token = access_token
+    consumer_token: ConsumerToken
+    access_token: AccessToken
+    app_name: str = DEFAULT_APP_NAME
 
     async def get_client(
-        self, email: str, password: str, httpx_client: AsyncClient = None
+        self, email: str, password: str, timeout: int, httpx_client: AsyncClient = None
     ) -> AsyncOAuth1Client:
         """Returns a AsyncOAuth1Client."""
 
         await self._do_exchange(email, password)
-        return AsyncOAuth1Client(**self._get_oauth_client_params())
+        return AsyncOAuth1Client(**self._get_oauth_client_params(), timeout=timeout)
 
     async def _do_exchange(
         self, email: str, password: str

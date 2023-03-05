@@ -28,9 +28,9 @@ pytest-cov = "^4.0.0"
 respx = "^0.20.1"
 pylint = "^2.15.9"
 flake8 = "^6.0.0"
-black = "^22.12.0"
+black = "^23.1.0"
 pre-commit = "^2.21.0"
-isort = "^5.11.4"
+isort = "^5.12.0"
 pytest-httpx = "^0.21.2"
 
 [tool.black]

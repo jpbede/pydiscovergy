@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/python-poetry/poetry
-    rev: '1.3.1'
+    rev: '1.4.0'
     hooks:
       - id: poetry-check
       - id: poetry-lock
@@ -14,7 +14,7 @@ repos:
         args: [--py310-plus]
 
   - repo: https://github.com/PyCQA/autoflake
-    rev: v2.0.0
+    rev: v2.0.1
     hooks:
       - id: autoflake
         args:
@@ -22,7 +22,7 @@ repos:
           - --remove-all-unused-imports
 
   - repo: https://github.com/psf/black
-    rev: 22.12.0
+    rev: 23.1.0
     hooks:
       - id: black
 
@@ -42,7 +42,7 @@ repos:
         files: ^(pydiscovergy|script|tests)/.+\.py$
 
   - repo: https://github.com/PyCQA/isort
-    rev: 5.11.4
+    rev: 5.12.0
     hooks:
       - id: isort
 

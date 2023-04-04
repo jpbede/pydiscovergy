@@ -23,7 +23,7 @@ dataclasses-json = "^0.5.7"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"
-pytest-asyncio = "^0.20.3"
+pytest-asyncio = ">=0.20.3,<0.22.0"
 pytest-cov = "^4.0.0"
 respx = "^0.20.1"
 pylint = "^2.15.9"

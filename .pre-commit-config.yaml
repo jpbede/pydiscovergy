@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/python-poetry/poetry
-    rev: '1.4.0'
+    rev: '1.4.2'
     hooks:
       - id: poetry-check
       - id: poetry-lock
@@ -8,13 +8,13 @@ repos:
         args: ["--with", "dev"]
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.3.1
+    rev: v3.4.0
     hooks:
       - id: pyupgrade
         args: [--py310-plus]
 
   - repo: https://github.com/PyCQA/autoflake
-    rev: v2.0.1
+    rev: v2.1.1
     hooks:
       - id: autoflake
         args:
@@ -22,7 +22,7 @@ repos:
           - --remove-all-unused-imports
 
   - repo: https://github.com/psf/black
-    rev: 23.1.0
+    rev: 23.3.0
     hooks:
       - id: black
 

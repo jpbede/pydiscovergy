@@ -7,5 +7,18 @@
   "rebaseWhen": "behind-base-branch",
   "labels": ["dependencies"],
   "commitMessagePrefix": "⬆️",
-  "commitMessageTopic": "{{depName}}"
+  "commitMessageTopic": "{{depName}}",
+  "pre-commit": {
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "matchManagers": ["poetry"],
+      "matchFiles": [".pre-commit-config.yaml"],
+      "matchUpdateTypes": ["minor", "patch", "pin", "pinDigest", "digest", "lockFileMaintenance", "rollback", "bump"],
+      "groupName": "Python devDependencies - non-major",
+      "groupSlug": "python-devdeps-nonmajor",
+      "automerge": true
+    }
+  ]
 }

@@ -18,7 +18,7 @@ keywords = ["discovergy", "smart meter", "smart home"]
 [tool.poetry.dependencies]
 python = "^3.9"
 Authlib = "^1.2.0"
-httpx = "^0.23.3"
+httpx = "^0.24.0"
 dataclasses-json = "^0.5.7"
 
 [tool.poetry.group.dev.dependencies]
@@ -31,7 +31,7 @@ flake8 = "^6.0.0"
 black = "^23.1.0"
 pre-commit = ">=2.21,<4.0"
 isort = "^5.12.0"
-pytest-httpx = "^0.21.2"
+pytest-httpx = "^0.22.0"
 
 [tool.black]
 target-version = ["py310"]

@@ -14,9 +14,15 @@
   "packageRules": [
     {
       "matchManagers": ["poetry"],
+      "matchDepTypes": ["dev-dependencies"],
       "matchUpdateTypes": ["minor", "patch", "pin", "pinDigest", "digest", "lockFileMaintenance", "rollback", "bump"],
       "groupName": "Python devDependencies - non-major",
       "groupSlug": "python-devdeps-nonmajor",
+      "automerge": true
+    },
+    {
+      "matchFiles": [".pre-commit-config.yaml"],
+      "groupName": "pre-commit hooks",
       "automerge": true
     }
   ]

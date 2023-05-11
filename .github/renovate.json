@@ -1,0 +1,23 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    "group:test"
+  ],
+  "rebaseWhen": "behind-base-branch",
+  "labels": ["dependencies"],
+  "commitMessagePrefix": "⬆️",
+  "commitMessageTopic": "{{depName}}",
+  "pre-commit": {
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "matchManagers": ["poetry"],
+      "matchUpdateTypes": ["minor", "patch", "pin", "pinDigest", "digest", "lockFileMaintenance", "rollback", "bump"],
+      "groupName": "Python devDependencies - non-major",
+      "groupSlug": "python-devdeps-nonmajor",
+      "automerge": true
+    }
+  ]
+}

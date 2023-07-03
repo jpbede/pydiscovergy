@@ -2,11 +2,12 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:base",
-    "group:test"
+    "group:test",
+    ":semanticCommits",
+    ":disableDependencyDashboard"
   ],
   "rebaseWhen": "behind-base-branch",
   "labels": ["dependencies"],
-  "commitMessagePrefix": "⬆️",
   "commitMessageTopic": "{{depName}}",
   "pre-commit": {
     "enabled": true
@@ -17,13 +18,15 @@
       "matchDepTypes": ["dev-dependencies"],
       "matchUpdateTypes": ["minor", "patch", "pin", "pinDigest", "digest", "lockFileMaintenance", "rollback", "bump"],
       "groupName": "Python devDependencies - non-major",
-      "groupSlug": "python-devdeps-nonmajor",
-      "automerge": true
+      "groupSlug": "python-devdeps-nonmajor"
     },
     {
       "matchFiles": [".pre-commit-config.yaml"],
-      "groupName": "pre-commit hooks",
-      "automerge": true
+      "groupName": "pre-commit hooks"
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions"
     }
   ]
 }

@@ -1,5 +1,0 @@
-[flake8]
-exclude = .git,.tox,__pycache__
-max-line-length = 88
-select = C,E,F,W,B,SIM,T
-ignore = E501,B950,W503,E203

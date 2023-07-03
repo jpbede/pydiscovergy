@@ -25,15 +25,11 @@ jobs:
       - name: "Run pyupgrade"
         run: |
           poetry run pre-commit run pyupgrade --all-files
-      - name: "Code formating (black)"
+      - name: "Run black"
         run: |
           poetry run pre-commit run black --all-files
-      - name: "Code formating (flake8)"
-        run: |
-          poetry run pre-commit run flake8 --all-files
-      - name: "Order of imports (isort)"
-        run: |
-          poetry run pre-commit run isort --all-files
+      - name: "Run ruff"
+        uses: chartboost/ruff-action@v1
 
   tests:
     name: "Python ${{ matrix.python-version}} on ${{ matrix.os }}"

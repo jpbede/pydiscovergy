@@ -1,10 +1,10 @@
 """Discovergy API."""
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from datetime import datetime
 from importlib import metadata
-import json
 from typing import Any
 
 import httpx

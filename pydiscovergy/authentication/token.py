@@ -1,8 +1,8 @@
 """Authentication module for token auth."""
 from __future__ import annotations
 
-from dataclasses import dataclass
 import json
+from dataclasses import dataclass
 from urllib.parse import parse_qs
 
 from authlib.integrations.httpx_client import AsyncOAuth1Client
@@ -67,11 +67,13 @@ class TokenAuth(BaseAuthentication):
     ) -> tuple[AccessToken, ConsumerToken] | tuple[AccessToken, None]:
         """Do the auth workflow."""
 
-        # class already initialised with consumer and access token so we don't need to request one
+        # class already initialised with consumer and access token,
+        # so we don't need to request one
         if self.consumer_token is not None and self.access_token is not None:
             return self.access_token, self.consumer_token
 
-        # no access token and consumer token were supplied so we need to do the auth workflow
+        # no access token and consumer token were supplied,
+        # so we need to do the auth workflow
         # first fetch a consumer token
         await self._fetch_consumer_token()
 
@@ -170,7 +172,8 @@ class TokenAuth(BaseAuthentication):
                     # the credentials are invaild so raise the correct error
                     raise InvalidLogin from exc
                 raise HTTPError(
-                    f"Request failed with {exc.response.status_code}: {exc.response.content}"
+                    f"Request failed with {exc.response.status_code}: "
+                    f"{exc.response.content}"
                 ) from exc
 
     async def _fetch_access_token(

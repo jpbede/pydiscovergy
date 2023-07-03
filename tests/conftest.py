@@ -49,6 +49,19 @@ def discovergy_mock():
 
 
 @pytest.fixture
+def discovergy_token_mock():
+    instance = pydiscovergy.Discovergy(
+        email="example@example.com",
+        password="example",
+        authentication=TokenAuth(
+            consumer_token=ConsumerToken("key123", "secret123"),
+            access_token=AccessToken("access_token", "access_token_secret"),
+        ),
+    )
+    yield instance
+
+
+@pytest.fixture
 def tokenauth_mock():
     instance = TokenAuth(
         consumer_token=ConsumerToken("key123", "secret123"),

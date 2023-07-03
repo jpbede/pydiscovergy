@@ -7,6 +7,7 @@ from pytest_httpx import HTTPXMock
 from pydiscovergy import Discovergy
 from pydiscovergy.const import API_BASE
 from pydiscovergy.error import (
+    AccessTokenExpired,
     DiscovergyClientError,
     DiscovergyError,
     HTTPError,
@@ -30,6 +31,19 @@ async def test_get_timeout(
 
 @pytest.mark.asyncio
 @pytest.mark.respx(base_url=API_BASE)
+async def test_token_auth_expired(
+    respx_mock, discovergy_token_mock: Discovergy
+) -> None:
+    respx_mock.get("/test").respond(json={"key": "value"})
+
+    # check if AccessTokenExpired is raised when there was an HTTP status 401
+    with pytest.raises(AccessTokenExpired):
+        respx_mock.get("/test").respond(status_code=401)
+        await discovergy_token_mock._get("/test")
+
+
+@pytest.mark.asyncio
+@pytest.mark.respx(base_url=API_BASE)
 async def test__get(respx_mock, discovergy_mock: Discovergy) -> None:
     mock_req = respx_mock.get("/test").respond(json={"key": "value"})
 
@@ -48,7 +62,7 @@ async def test__get(respx_mock, discovergy_mock: Discovergy) -> None:
         respx_mock.get("/test").mock(side_effect=httpx.RequestError)
         await discovergy_mock._get("/test")
 
-    # check if AccessTokenExpired is raised when there was an HTTP status 401
+    # check if InvalidLogin is raised when there was an HTTP status 401
     with pytest.raises(InvalidLogin):
         respx_mock.get("/test").respond(status_code=401)
         await discovergy_mock._get("/test")

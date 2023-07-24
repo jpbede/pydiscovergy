@@ -4,7 +4,6 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from datetime import datetime
-from importlib import metadata
 from typing import Any
 
 import httpx
@@ -35,16 +34,6 @@ class Discovergy:
     async def _get(self, path: str, params: dict[str, Any] = None) -> Any:
         """Execute a GET request against the API."""
 
-        try:
-            version = metadata.version(__package__ or __name__)
-        except metadata.PackageNotFoundError:
-            version = "0.0.0"
-
-        headers = {
-            "User-Agent": f"pydiscovergy/{version}",
-            "Accept": "application/json",
-        }
-
         # remove keys with empty values
         if params is not None:
             params = {key: value for (key, value) in params.items() if value != ""}
@@ -59,9 +48,7 @@ class Discovergy:
 
         try:
             async with client:
-                response = await client.get(
-                    url=API_BASE + path, params=params, headers=headers
-                )
+                response = await client.get(url=API_BASE + path, params=params)
                 response.raise_for_status()
 
                 return json.loads(response.content.decode("utf-8"))

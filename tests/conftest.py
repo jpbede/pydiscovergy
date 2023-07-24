@@ -2,14 +2,13 @@ import pytest
 import respx
 
 import pydiscovergy
-from pydiscovergy.authentication import BasicAuth, TokenAuth
+from pydiscovergy.authentication import AccessToken, ConsumerToken, TokenAuth
 from pydiscovergy.const import (
     API_ACCESS_TOKEN,
     API_AUTHORIZATION,
     API_CONSUMER_TOKEN,
     API_REQUEST_TOKEN,
 )
-from pydiscovergy.models import AccessToken, ConsumerToken
 
 
 @pytest.fixture
@@ -43,10 +42,21 @@ def mocked_login():
 @pytest.fixture
 def discovergy_mock():
     instance = pydiscovergy.Discovergy(
-        email="demo@discovergy.com",
-        password="demod",
-        app_name="pytest",
-        authentication=BasicAuth(),
+        email="example@example.com",
+        password="example",
+    )
+    yield instance
+
+
+@pytest.fixture
+def discovergy_token_mock():
+    instance = pydiscovergy.Discovergy(
+        email="example@example.com",
+        password="example",
+        authentication=TokenAuth(
+            consumer_token=ConsumerToken("key123", "secret123"),
+            access_token=AccessToken("access_token", "access_token_secret"),
+        ),
     )
     yield instance
 
@@ -57,34 +67,4 @@ def tokenauth_mock():
         consumer_token=ConsumerToken("key123", "secret123"),
         access_token=AccessToken("access_token", "access_token_secret"),
     )
-    instance.app_name = "pytest"
     yield instance
-
-
-@pytest.fixture
-def meter_json_mock():
-    return [
-        {
-            "meterId": "f8d610b7a8cc4e73939fa33b990ded54",
-            "manufacturerId": "ESY",
-            "serialNumber": "123456789",
-            "fullSerialNumber": "1ESY123456789",
-            "location": {
-                "street": "Beispielstr.",
-                "streetNumber": "22",
-                "zip": "56897",
-                "city": "Testhausen",
-                "country": "DE",
-            },
-            "administrationNumber": "DE0001234567800000000000012345678",
-            "type": "EASYMETER",
-            "measurementType": "ELECTRICITY",
-            "loadProfileType": "SLP",
-            "scalingFactor": 1,
-            "currentScalingFactor": 1,
-            "voltageScalingFactor": 1,
-            "internalMeters": 1,
-            "firstMeasurementTime": 1517569090926,
-            "lastMeasurementTime": 1629195318032,
-        }
-    ]

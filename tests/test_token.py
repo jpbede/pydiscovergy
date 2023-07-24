@@ -1,14 +1,15 @@
 import httpx
 import pytest
 
+from pydiscovergy.authentication import ConsumerToken, RequestToken
 from pydiscovergy.const import API_BASE
 from pydiscovergy.error import (
     DiscovergyClientError,
     DiscovergyError,
     HTTPError,
     InvalidLogin,
+    MissingToken,
 )
-from pydiscovergy.models import ConsumerToken, RequestToken
 
 
 @pytest.mark.asyncio
@@ -147,3 +148,19 @@ async def test_fetch_access_token(respx_mock, tokenauth_mock) -> None:
         )
 
     assert mock_req2.called
+
+
+@pytest.mark.asyncio
+async def test_missing_consumer_token(tokenauth_mock) -> None:
+    tokenauth_mock.consumer_token = None
+
+    with pytest.raises(MissingToken):
+        tokenauth_mock._get_oauth_client_params()
+
+
+@pytest.mark.asyncio
+async def test_missing_access_token(tokenauth_mock) -> None:
+    tokenauth_mock.access_token = None
+
+    with pytest.raises(MissingToken):
+        tokenauth_mock._get_oauth_client_params()

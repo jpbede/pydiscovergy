@@ -5,7 +5,7 @@ from pydiscovergy import Discovergy
 
 
 async def main():
-    discovergy = Discovergy(email="demo@discovergy.com", password="demo")
+    discovergy = Discovergy(email="example@example.org", password="example")
     meters = await discovergy.meters()
 
     for meter in meters:

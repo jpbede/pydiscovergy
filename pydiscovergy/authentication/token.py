@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass
 from urllib.parse import parse_qs
 
 from authlib.integrations.httpx_client import AsyncOAuth1Client
@@ -12,6 +13,7 @@ from ..const import (
     API_AUTHORIZATION,
     API_CONSUMER_TOKEN,
     API_REQUEST_TOKEN,
+    DEFAULT_APP_NAME,
 )
 from ..error import (
     DiscovergyClientError,
@@ -20,38 +22,58 @@ from ..error import (
     InvalidLogin,
     MissingToken,
 )
-from ..models import AccessToken, ConsumerToken, RequestToken
 from .base import BaseAuthentication
 
 
+@dataclass
+class ConsumerToken:
+    """Represents a consumer token pair."""
+
+    key: str
+    secret: str
+
+
+@dataclass
+class RequestToken:
+    """Represents a request token pair."""
+
+    token: str
+    token_secret: str
+
+
+@dataclass
+class AccessToken(RequestToken):
+    """Represents an access token pair."""
+
+
+@dataclass
 class TokenAuth(BaseAuthentication):
     """Authentication class for token auth."""
 
-    def __init__(
-        self, consumer_token: ConsumerToken = None, access_token: AccessToken = None
-    ):
-        """"""
-        self.consumer_token = consumer_token
-        self.access_token = access_token
+    consumer_token: ConsumerToken
+    access_token: AccessToken
+    app_name: str = DEFAULT_APP_NAME
 
     async def get_client(
-        self, email: str, password: str, httpx_client: AsyncClient = None
+        self, email: str, password: str, timeout: int, httpx_client: AsyncClient = None
     ) -> AsyncOAuth1Client:
         """Returns a AsyncOAuth1Client."""
 
         await self._do_exchange(email, password)
-        return AsyncOAuth1Client(**self._get_oauth_client_params())
+        return AsyncOAuth1Client(**self._get_oauth_client_params(), timeout=timeout)
 
     async def _do_exchange(
         self, email: str, password: str
     ) -> tuple[AccessToken, ConsumerToken] | tuple[AccessToken, None]:
         """Do the auth workflow."""
 
-        # class already initialised with consumer and access token so we don't need to request one
+        # class already initialised with consumer and access token,
+        # so we don't need to request one
         if self.consumer_token is not None and self.access_token is not None:
             return self.access_token, self.consumer_token
 
-        # no access token and consumer token were supplied so we need to do the auth workflow
+        # no access token and consumer token were supplied,
+        # so we need to do the auth workflow
         # first fetch a consumer token
         await self._fetch_consumer_token()
 
@@ -150,7 +172,8 @@ class TokenAuth(BaseAuthentication):
                     # the credentials are invaild so raise the correct error
                     raise InvalidLogin from exc
                 raise HTTPError(
-                    f"Request failed with {exc.response.status_code}: {exc.response.content}"
+                    f"Request failed with {exc.response.status_code}: "
+                    f"{exc.response.content}"
                 ) from exc
 
     async def _fetch_access_token(

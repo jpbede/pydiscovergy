@@ -2,9 +2,11 @@ name: CI
 
 on:
   push:
-    branches: ["dev"]
+    branches:
+      - '*'
   pull_request:
-    branches: ["dev"]
+    branches:
+      - dev
 
 jobs:
   linting:
@@ -12,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10"]
+        python-version: ["3.10", "3.11"]
     steps:
       - uses: "actions/checkout@v3"
       - uses: "actions/setup-python@v4"
@@ -25,15 +27,11 @@ jobs:
       - name: "Run pyupgrade"
         run: |
           poetry run pre-commit run pyupgrade --all-files
-      - name: "Code formating (black)"
+      - name: "Run black"
         run: |
           poetry run pre-commit run black --all-files
-      - name: "Code formating (flake8)"
-        run: |
-          poetry run pre-commit run flake8 --all-files
-      - name: "Order of imports (isort)"
-        run: |
-          poetry run pre-commit run isort --all-files
+      - name: "Run ruff"
+        uses: chartboost/ruff-action@v1
 
   tests:
     name: "Python ${{ matrix.python-version}} on ${{ matrix.os }}"

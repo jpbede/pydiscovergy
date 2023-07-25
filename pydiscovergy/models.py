@@ -2,6 +2,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 
+import pytz
 from dataclasses_json import CatchAll, LetterCase, Undefined, config, dataclass_json
 from marshmallow import fields
 
@@ -29,6 +30,10 @@ class Reading:
             mm_field=fields.Dict(keys=fields.String(), values=fields.Float())
         )
     )
+
+    @property
+    def time_with_timezone(self) -> datetime:
+        return pytz.timezone("UTC").localize(self.time)
 
 
 @dataclass_json

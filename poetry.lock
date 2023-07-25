@@ -676,6 +676,17 @@ pytest = ">=6.0,<8.0"
 testing = ["pytest-asyncio (==0.20.*)", "pytest-cov (==4.*)"]
 
 [[package]]
+name = "pytz"
+version = "2023.3"
+description = "World timezone definitions, modern and historical"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pytz-2023.3-py2.py3-none-any.whl", hash = "sha256:a151b3abb88eda1d4e34a9814df37de2a80e301e68ba0fd856fb9b46bfbbbffb"},
+    {file = "pytz-2023.3.tar.gz", hash = "sha256:1d8ce29db189191fb55338ee6d0387d82ab59f3d00eac103412d64e0ebd0c588"},
+]
+
+[[package]]
 name = "pyyaml"
 version = "6.0.1"
 description = "YAML parser and emitter for Python"
@@ -825,4 +836,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9, <3.12"
-content-hash = "42a5a63cad571200c6fb86cc086b90ac4fa2dbda7532f6513f1bfb089c9b67e3"
+content-hash = "7c9e55616058ca711b0764d97802aecc5610f42cf5da10df68b2923dbb105754"

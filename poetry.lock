@@ -23,17 +23,20 @@ trio = ["trio (<0.22)"]
 
 [[package]]
 name = "authlib"
-version = "1.2.1"
-description = "The ultimate Python library in building OAuth and OpenID Connect servers and clients."
+version = "0.15.6"
+description = "The ultimate Python library in building OAuth and OpenID Connect servers."
 optional = false
 python-versions = "*"
 files = [
-    {file = "Authlib-1.2.1-py2.py3-none-any.whl", hash = "sha256:c88984ea00149a90e3537c964327da930779afa4564e354edfd98410bea01911"},
-    {file = "Authlib-1.2.1.tar.gz", hash = "sha256:421f7c6b468d907ca2d9afede256f068f87e34d23dd221c07d13d4c234726afb"},
+    {file = "Authlib-0.15.6-py2.py3-none-any.whl", hash = "sha256:6de4508ba8125e438a35bcd910d55df7087dccd3dd8517095c2bd9853c372ec1"},
+    {file = "Authlib-0.15.6.tar.gz", hash = "sha256:2988fdf7d0a5c416f5a37ca4b1e7cee360094940229bc97909aed25880326c72"},
 ]
 
 [package.dependencies]
-cryptography = ">=3.2"
+cryptography = "*"
+
+[package.extras]
+client = ["requests"]
 
 [[package]]
 name = "black"
@@ -822,4 +825,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9, <3.12"
-content-hash = "fcc073b49b96aaad2eb4167abb6b5b6228c7aa3e41a9b71c16ea7a69bdf1d959"
+content-hash = "42a5a63cad571200c6fb86cc086b90ac4fa2dbda7532f6513f1bfb089c9b67e3"

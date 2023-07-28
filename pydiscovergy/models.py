@@ -8,7 +8,7 @@ from marshmallow import fields
 
 
 @dataclass_json(letter_case=LetterCase.CAMEL)
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Location:
     """Represents a smart meter location."""
 
@@ -20,7 +20,7 @@ class Location:
 
 
 @dataclass_json
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Reading:
     """Represents a reading of a smart meter."""
 
@@ -37,7 +37,7 @@ class Reading:
 
 
 @dataclass_json
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Statistic:
     """Represents a meter statistic entry."""
 
@@ -49,7 +49,7 @@ class Statistic:
 
 
 @dataclass_json(undefined=Undefined.INCLUDE, letter_case=LetterCase.CAMEL)
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Meter:
     """Represents a smart meter."""
 

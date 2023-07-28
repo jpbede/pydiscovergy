@@ -9,6 +9,10 @@ class BaseAuthentication(ABC):
 
     @abstractmethod
     async def get_client(
-        self, email: str, password: str, timeout: int, httpx_client: AsyncClient = None
+        self,
+        email: str,
+        password: str,
+        timeout: int,
+        httpx_client: AsyncClient | None = None,
     ) -> AsyncClient:
         """Function that needed to be implemented by authentication modules."""

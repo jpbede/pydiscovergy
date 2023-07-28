@@ -12,7 +12,11 @@ class BasicAuth(BaseAuthentication):
     """Authentication module for basic auth."""
 
     async def get_client(
-        self, email: str, password: str, timeout: int, httpx_client: AsyncClient = None
+        self,
+        email: str,
+        password: str,
+        timeout: int,
+        httpx_client: AsyncClient | None = None,
     ) -> AsyncClient:
         """Returns a httpx client with basic authentication."""
 

@@ -5,7 +5,7 @@ import json
 from dataclasses import dataclass
 from urllib.parse import parse_qs
 
-from authlib.integrations.httpx_client import AsyncOAuth1Client
+from authlib.integrations.httpx_client import AsyncOAuth1Client  # type: ignore[import]
 from httpx import AsyncClient, HTTPStatusError, RequestError
 
 from ..const import (
@@ -55,7 +55,11 @@ class TokenAuth(BaseAuthentication):
     app_name: str = DEFAULT_APP_NAME
 
     async def get_client(
-        self, email: str, password: str, timeout: int, httpx_client: AsyncClient = None
+        self,
+        email: str,
+        password: str,
+        timeout: int,
+        httpx_client: AsyncClient | None = None,
     ) -> AsyncOAuth1Client:
         """Returns a AsyncOAuth1Client."""
 
@@ -126,7 +130,7 @@ class TokenAuth(BaseAuthentication):
                 raise DiscovergyClientError from exc
             except HTTPStatusError as exc:
                 raise HTTPError(
-                    f"Status {exc.response.status_code}: {exc.response.content}"
+                    f"Status {exc.response.status_code}: {exc.response.content!r}"
                 ) from exc
             except json.JSONDecodeError as exc:
                 raise DiscovergyError(f"Failed to decode json: {exc}") from exc
@@ -173,7 +177,7 @@ class TokenAuth(BaseAuthentication):
                     raise InvalidLogin from exc
                 raise HTTPError(
                     f"Request failed with {exc.response.status_code}: "
-                    f"{exc.response.content}"
+                    f"{exc.response.content!r}"
                 ) from exc
 
     async def _fetch_access_token(

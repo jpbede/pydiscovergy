@@ -31,7 +31,7 @@ class Statistics(DataClassJsonMixin):
         metadata=config(
             mm_field=fields.Dict(
                 keys=fields.String(),
-                values=fields.Nested(Statistic.schema()),  # pylint: disable=no-member
+                values=fields.Nested(Statistic.schema()),  # type: ignore[attr-defined]
             )
         )
     )

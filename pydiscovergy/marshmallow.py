@@ -7,14 +7,14 @@ from marshmallow import fields
 from pydiscovergy.models import Statistic
 
 
-@dataclass
+@dataclass(frozen=True, slots=True)
 class DeviceList(DataClassJsonMixin):
     """Helper class to deserialize device data from API."""
 
     devices: list[str] = field(metadata=config(mm_field=fields.List(fields.String())))
 
 
-@dataclass
+@dataclass(frozen=True, slots=True)
 class FieldNameList(DataClassJsonMixin):
     """Helper class to deserialize field name data from API."""
 
@@ -23,7 +23,7 @@ class FieldNameList(DataClassJsonMixin):
     )
 
 
-@dataclass
+@dataclass(frozen=True, slots=True)
 class Statistics(DataClassJsonMixin):
     """Helper class to deserialize statistics data from API."""
 

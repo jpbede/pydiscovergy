@@ -28,10 +28,10 @@ class Discovergy:
     email: str
     password: str
     timeout: int = DEFAULT_TIMEOUT
-    httpx_client: httpx.AsyncClient = None
+    httpx_client: httpx.AsyncClient | None = None
     authentication: BaseAuthentication = BasicAuth()
 
-    async def _get(self, path: str, params: dict[str, Any] = None) -> Any:
+    async def _get(self, path: str, params: dict[str, Any] | None = None) -> Any:
         """Execute a GET request against the API."""
 
         # remove keys with empty values
@@ -73,7 +73,7 @@ class Discovergy:
 
             raise HTTPError(
                 f"Request failed with HTTP status {exception.response.status_code}: "
-                f"{exception.response.content}"
+                f"{exception.response.content!r}"
             ) from exception
         except json.JSONDecodeError as exception:
             raise DiscovergyError(f"JSON decoding failed: {exception}") from exception
@@ -81,12 +81,12 @@ class Discovergy:
     async def meters(self) -> list[Meter]:
         """Get list of smart meters."""
         response = await self._get("/meters")
-        return Meter.schema().load(response, many=True)  # pylint: disable=no-member
+        return Meter.schema().load(response, many=True)  # type: ignore[attr-defined]
 
     async def meter_last_reading(self, meter_id: str) -> Reading:
         """Get last reading for meter"""
         response = await self._get("/last_reading", params={"meterId": meter_id})
-        return Reading.schema().load(response)  # pylint: disable=no-member
+        return Reading.schema().load(response)  # type: ignore[attr-defined]
 
     async def meter_readings(
         self,
@@ -126,7 +126,7 @@ class Discovergy:
         }
 
         response = await self._get("/readings", params)
-        return Reading.schema().load(response, many=True)  # pylint: disable=no-member
+        return Reading.schema().load(response, many=True)  # type: ignore[attr-defined]
 
     async def meter_field_names(self, meter_id: str) -> list[str]:
         """Return all available measurement field names for the specified meter."""

@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "pydiscovergy"
-version = "2.0.2"
+version = "2.0.3"
 description = "Async Python 3 library for interacting with Discovergy smart meters API"
 authors = ["Jan-Philipp Benecke <jan-philipp@bnck.me>"]
 repository = "https://github.com/jpbede/pydiscovergy"
@@ -16,10 +16,10 @@ packages = [
 keywords = ["discovergy", "smart meter", "smart home"]
 
 [tool.poetry.dependencies]
-python = ">=3.9, <3.12"
-authlib = "<1.0.0"
+python = ">=3.9, <3.13" # needed by dataclasses-json
+authlib = ">=0.15"
 httpx = "^0.24.0"
-dataclasses-json = "^0.5.13"
+dataclasses-json = "^0.5.14"
 marshmallow = "^3.19.0"
 pytz = "^2023.3"
 
@@ -31,6 +31,8 @@ respx = "^0.20.1"
 black = "^23.1.0"
 pre-commit = ">=2.21,<4.0"
 pytest-httpx = "^0.22.0"
+mypy = "^1.4.1"
+ruff = "^0.0.280"
 
 [tool.black]
 target-version = ["py311"]

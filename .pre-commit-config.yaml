@@ -6,7 +6,6 @@ repos:
       - id: check-json
       - id: no-commit-to-branch
         args:
-          - --branch=dev
           - --branch=main
 
   - repo: https://github.com/python-poetry/poetry

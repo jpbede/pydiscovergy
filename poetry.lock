@@ -702,13 +702,13 @@ testing = ["fields", "hunter", "process-tests", "pytest-xdist", "six", "virtuale
 
 [[package]]
 name = "pytest-httpx"
-version = "0.23.0"
+version = "0.23.1"
 description = "Send responses to httpx."
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "pytest_httpx-0.23.0-py3-none-any.whl", hash = "sha256:4d74c19932bdd04b1d9ff1b8089c37d0cec00c3f21ed14d867c0b86df35d0759"},
-    {file = "pytest_httpx-0.23.0.tar.gz", hash = "sha256:2ff221ab1a0a4ada5ac78a94b359dbefe4766f6d85588a5eb08e7ff3d3385061"},
+    {file = "pytest_httpx-0.23.1-py3-none-any.whl", hash = "sha256:ba38a9e6c685d3cf6197551a79bf7e41f8bbc57a6d1de65b537f77e87f56ecd3"},
+    {file = "pytest_httpx-0.23.1.tar.gz", hash = "sha256:cfed19eb8b13cbdf464bbb1c4ef88717d88d42334aa9ce516e56e46975c77f74"},
 ]
 
 [package.dependencies]

@@ -30,7 +30,7 @@ pytest-cov = "^4.0.0"
 respx = "^0.20.1"
 black = "^23.1.0"
 pre-commit = ">=2.21,<4.0"
-pytest-httpx = "^0.23.0"
+pytest-httpx = "^0.24.0"
 mypy = "^1.4.1"
 ruff = "^0.0.287"
 

@@ -18,7 +18,7 @@ keywords = ["discovergy", "smart meter", "smart home"]
 [tool.poetry.dependencies]
 python = ">=3.9, <3.13" # needed by dataclasses-json
 authlib = ">=0.15"
-httpx = "^0.24.0"
+httpx = "^0.25.0"
 dataclasses-json = "^0.6.0"
 marshmallow = "^3.19.0"
 pytz = "^2023.3"

@@ -51,7 +51,11 @@ class Discovergy:
                 response = await client.get(url=API_BASE + path, params=params)
                 response.raise_for_status()
 
-                return json.loads(response.content.decode("utf-8"))
+                decoded = response.content.decode("utf-8")
+                if decoded != "":
+                    return json.loads(decoded)
+
+                return None
         except httpx.TimeoutException as exception:
             raise DiscovergyClientError(
                 "Timeout occurred while connecting to Discovergy."
@@ -81,12 +85,17 @@ class Discovergy:
     async def meters(self) -> list[Meter]:
         """Get list of smart meters."""
         response = await self._get("/meters")
-        return Meter.schema().load(response, many=True)  # type: ignore[attr-defined]
+        if response is not None:
+            return Meter.schema().load(response, many=True)  # type: ignore[attr-defined]
+        return []
 
     async def meter_last_reading(self, meter_id: str) -> Reading:
         """Get last reading for meter"""
         response = await self._get("/last_reading", params={"meterId": meter_id})
-        return Reading.schema().load(response)  # type: ignore[attr-defined]
+        if response is not None:
+            return Reading.schema().load(response, partial=True)  # type: ignore[attr-defined]
+
+        return Reading(time=datetime.utcnow(), values={})
 
     async def meter_readings(
         self,
@@ -126,17 +135,23 @@ class Discovergy:
         }
 
         response = await self._get("/readings", params)
-        return Reading.schema().load(response, many=True)  # type: ignore[attr-defined]
+        if response is not None:
+            return Reading.schema().load(response, many=True)  # type: ignore[attr-defined]
+        return []
 
     async def meter_field_names(self, meter_id: str) -> list[str]:
         """Return all available measurement field names for the specified meter."""
         field_names = await self._get("/field_names", params={"meterId": meter_id})
-        return FieldNameList.schema().load({"field_names": field_names}).field_names
+        if field_names is not None:
+            return FieldNameList.schema().load({"field_names": field_names}).field_names
+        return []
 
     async def meter_devices(self, meter_id: str) -> list[str]:
         """Return all recognized devices by meter id."""
         devices = await self._get("/devices", params={"meterId": meter_id})
-        return DeviceList.schema().load({"devices": devices}).devices
+        if devices is not None:
+            return DeviceList.schema().load({"devices": devices}).devices
+        return []
 
     async def meter_statistics(
         self,
@@ -163,4 +178,6 @@ class Discovergy:
         }
 
         statistics = await self._get("/statistics", params)
-        return Statistics.schema().load({"statistics": statistics}).statistics
+        if statistics is not None:
+            return Statistics.schema().load({"statistics": statistics}).statistics
+        return {}

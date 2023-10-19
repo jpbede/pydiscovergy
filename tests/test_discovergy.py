@@ -104,6 +104,23 @@ async def test_meter_last_reading(respx_mock, discovergy_mock: Discovergy) -> No
 
 @pytest.mark.asyncio
 @pytest.mark.respx(base_url=API_BASE)
+async def test_meter_last_reading_empty(
+    respx_mock, discovergy_mock: Discovergy
+) -> None:
+    mock_req = respx_mock.get(
+        "/last_reading", params={"meterId": "f8d610b7a8cc4e73939fa33b990ded54"}
+    ).respond(text="")
+
+    last_reading = await discovergy_mock.meter_last_reading(
+        "f8d610b7a8cc4e73939fa33b990ded54"
+    )
+
+    assert mock_req.called
+    assert isinstance(last_reading, Reading)
+
+
+@pytest.mark.asyncio
+@pytest.mark.respx(base_url=API_BASE)
 async def test_meter_devices(respx_mock, discovergy_mock: Discovergy) -> None:
     mock_req = respx_mock.get(
         "/devices", params={"meterId": "f8d610b7a8cc4e73939fa33b990ded54"}
@@ -114,6 +131,21 @@ async def test_meter_devices(respx_mock, discovergy_mock: Discovergy) -> None:
     assert mock_req.called
     assert len(devices) == 3
     assert devices == ["DEVICE_1", "DEVICE_2", "DEVICE_3"]
+    assert isinstance(devices, list)
+
+
+@pytest.mark.asyncio
+@pytest.mark.respx(base_url=API_BASE)
+async def test_meter_devices_empty(respx_mock, discovergy_mock: Discovergy) -> None:
+    mock_req = respx_mock.get(
+        "/devices", params={"meterId": "f8d610b7a8cc4e73939fa33b990ded54"}
+    ).respond(text="")
+
+    devices = await discovergy_mock.meter_devices("f8d610b7a8cc4e73939fa33b990ded54")
+
+    assert mock_req.called
+    assert len(devices) == 0
+    assert devices == []
     assert isinstance(devices, list)
 
 

@@ -74,6 +74,7 @@ repos:
         entry: poetry run codespell
         args:
           - --ignore-words-list=fo,incomfort,nam,bloc,ue
+          - --skip="./tests/fixtures"
       - id: detect-private-key
         name: 🕵️  Detect Private Keys
         language: system

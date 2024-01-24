@@ -70,7 +70,7 @@ repos:
         name: ✅ Check code for common misspellings
         language: system
         types: [text]
-        exclude: ^poetry\.lock$
+        exclude: ^poetry\.lock|.*\.json$
         entry: poetry run codespell
         args:
           - --ignore-words-list=fo,incomfort,nam,bloc,ue

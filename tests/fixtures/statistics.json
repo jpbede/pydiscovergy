@@ -1,16 +1,16 @@
 {
   "volume": {
     "count": 8,
-    "minimum":17787613,
-    "maximum":17788382,
-    "mean":1.7788012E7,
-    "variance":80125.50000046665
+    "minimum": 17787613,
+    "maximum": 17788382,
+    "mean": 1.7788012e7,
+    "variance": 80125.50000046665
   },
   "actualityDuration": {
     "count": 8,
     "minimum": 250000,
     "maximum": 556000,
     "mean": 424000.0,
-    "variance": 7.5215E9
+    "variance": 7.5215e9
   }
 }

@@ -3,7 +3,7 @@ name: Typing
 
 # yamllint disable-line rule:truthy
 on:
-  push:
+  push: [main]
   pull_request:
   workflow_dispatch:
 

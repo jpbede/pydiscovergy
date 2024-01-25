@@ -1,4 +1,5 @@
 """Discovergy constants."""
+from enum import StrEnum
 
 DEFAULT_APP_NAME = "pydicovergy"
 DEFAULT_TIMEOUT = 10
@@ -10,7 +11,7 @@ API_AUTHORIZATION = API_BASE + "/oauth1/authorize"
 API_ACCESS_TOKEN = API_BASE + "/oauth1/access_token"
 
 
-class Resolution:
+class Resolution(StrEnum):
     """Resolutions that can be used for readings."""
 
     RAW = "raw"

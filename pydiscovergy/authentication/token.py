@@ -1,27 +1,28 @@
 """Authentication module for token auth."""
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
+import json
 from urllib.parse import parse_qs
 
-from authlib.integrations.httpx_client import AsyncOAuth1Client  # type: ignore[import]
+from authlib.integrations.httpx_client import AsyncOAuth1Client
 from httpx import AsyncClient, HTTPStatusError, RequestError
 
-from ..const import (
+from pydiscovergy.const import (
     API_ACCESS_TOKEN,
     API_AUTHORIZATION,
     API_CONSUMER_TOKEN,
     API_REQUEST_TOKEN,
     DEFAULT_APP_NAME,
 )
-from ..error import (
+from pydiscovergy.error import (
     DiscovergyClientError,
     DiscovergyError,
     HTTPError,
     InvalidLogin,
     MissingToken,
 )
+
 from .base import BaseAuthentication
 
 
@@ -59,18 +60,18 @@ class TokenAuth(BaseAuthentication):
         email: str,
         password: str,
         timeout: int,
-        httpx_client: AsyncClient | None = None,
+        httpx_client: AsyncClient | None = None,  # noqa: ARG002
     ) -> AsyncOAuth1Client:
-        """Returns a AsyncOAuth1Client."""
-
+        """Return a AsyncOAuth1Client."""
         await self._do_exchange(email, password)
         return AsyncOAuth1Client(**self._get_oauth_client_params(), timeout=timeout)
 
     async def _do_exchange(
-        self, email: str, password: str
+        self,
+        email: str,
+        password: str,
     ) -> tuple[AccessToken, ConsumerToken] | tuple[AccessToken, None]:
         """Do the auth workflow."""
-
         # class already initialised with consumer and access token,
         # so we don't need to request one
         if self.consumer_token is not None and self.access_token is not None:
@@ -86,7 +87,9 @@ class TokenAuth(BaseAuthentication):
 
         # authorize the temporary request token with email and password
         verifier = await self._authorize_request_token(
-            email=email, password=password, request_token=temp_request_token.token
+            email=email,
+            password=password,
+            request_token=temp_request_token.token,
         )
 
         # trade the authorized temporarily request token to an access token
@@ -97,12 +100,14 @@ class TokenAuth(BaseAuthentication):
         )
         return self.access_token, self.consumer_token
 
-    def _get_oauth_client_params(self) -> dict:
+    def _get_oauth_client_params(self) -> dict[str, str]:
         """Return parameters for the OAuth1Client."""
         if self.consumer_token is None:
-            raise MissingToken("Consumer token is missing")
+            msg = "Consumer token is missing"
+            raise MissingToken(msg)
         if self.access_token is None:
-            raise MissingToken("Access token is missing")
+            msg = "Access token is missing"
+            raise MissingToken(msg)
 
         return {
             "client_id": self.consumer_token.key,
@@ -112,7 +117,7 @@ class TokenAuth(BaseAuthentication):
         }
 
     async def _fetch_consumer_token(self) -> ConsumerToken:
-        """Fetches consumer token for app name."""
+        """Fetch a consumer token for app name."""
         async with AsyncClient() as client:
             try:
                 consumer_response = await client.post(
@@ -123,36 +128,45 @@ class TokenAuth(BaseAuthentication):
 
                 consumer_tokens = json.loads(consumer_response.content.decode("utf-8"))
                 self.consumer_token = ConsumerToken(
-                    consumer_tokens["key"], consumer_tokens["secret"]
+                    consumer_tokens["key"],
+                    consumer_tokens["secret"],
                 )
-                return self.consumer_token
             except RequestError as exc:
                 raise DiscovergyClientError from exc
             except HTTPStatusError as exc:
+                msg = f"Status {exc.response.status_code}: {exc.response.content!r}"
                 raise HTTPError(
-                    f"Status {exc.response.status_code}: {exc.response.content!r}"
+                    msg,
                 ) from exc
             except json.JSONDecodeError as exc:
-                raise DiscovergyError(f"Failed to decode json: {exc}") from exc
+                msg = f"Failed to decode json: {exc}"
+                raise DiscovergyError(msg) from exc
+
+            return self.consumer_token
 
     async def _fetch_request_token(self) -> RequestToken:
         """Fetch request token."""
         async with AsyncOAuth1Client(
-            client_id=self.consumer_token.key, client_secret=self.consumer_token.secret
+            client_id=self.consumer_token.key,
+            client_secret=self.consumer_token.secret,
         ) as client:
             try:
                 oauth_token_response = await client.fetch_request_token(
-                    API_REQUEST_TOKEN
+                    API_REQUEST_TOKEN,
                 )
                 return RequestToken(
                     oauth_token_response.get("oauth_token"),
                     oauth_token_response.get("oauth_token_secret"),
                 )
-            except Exception as exc:
-                raise HTTPError(f"Request failed: {exc}") from exc
+            except Exception as exc:  # noqa: BLE001
+                msg = f"Request failed: {exc}"
+                raise HTTPError(msg) from exc
 
     async def _authorize_request_token(
-        self, email: str, password: str, request_token: str
+        self,
+        email: str,
+        password: str,
+        request_token: str,
     ) -> str:
         """Authorize request token for account."""
         async with AsyncClient() as client:
@@ -167,21 +181,26 @@ class TokenAuth(BaseAuthentication):
 
                 parsed_response = parse_qs(response.content.decode("utf-8"))
 
-                verifier = parsed_response["oauth_verifier"][0]
-                return verifier
+                return parsed_response["oauth_verifier"][0]
             except RequestError as exc:
                 raise DiscovergyClientError from exc
             except HTTPStatusError as exc:
                 if exc.response.status_code == 403:
-                    # the credentials are invaild so raise the correct error
+                    # the credentials are invalid so raise the correct error
                     raise InvalidLogin from exc
-                raise HTTPError(
+                msg = (
                     f"Request failed with {exc.response.status_code}: "
                     f"{exc.response.content!r}"
+                )
+                raise HTTPError(
+                    msg,
                 ) from exc
 
     async def _fetch_access_token(
-        self, request_token, request_token_secret, verifier
+        self,
+        request_token: str,
+        request_token_secret: str,
+        verifier: str,
     ) -> AccessToken:
         """Fetch access token."""
         async with AsyncOAuth1Client(
@@ -192,11 +211,13 @@ class TokenAuth(BaseAuthentication):
         ) as client:
             try:
                 access_token_response = await client.fetch_access_token(
-                    API_ACCESS_TOKEN, verifier
+                    API_ACCESS_TOKEN,
+                    verifier,
                 )
                 return AccessToken(
                     access_token_response.get("oauth_token"),
                     access_token_response.get("oauth_token_secret"),
                 )
-            except Exception as exc:
-                raise HTTPError(f"Request failed: {exc}") from exc
+            except Exception as exc:  # noqa: BLE001
+                msg = f"Request failed: {exc}"
+                raise HTTPError(msg) from exc

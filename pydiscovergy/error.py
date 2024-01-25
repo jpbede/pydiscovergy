@@ -9,17 +9,17 @@ class DiscovergyClientError(DiscovergyError):
     """Error occurred when there was a client error in Discovergy package."""
 
 
-class AccessTokenExpired(DiscovergyError):
-    """Expired access token exception"""
+class AccessTokenExpired(DiscovergyError):  # noqa: N818
+    """Expired access token exception."""
 
 
-class InvalidLogin(DiscovergyError):
-    """Invalid login exception"""
+class InvalidLogin(DiscovergyError):  # noqa: N818
+    """Invalid login exception."""
 
 
-class MissingToken(DiscovergyError):
-    """Token is missing exception"""
+class MissingToken(DiscovergyError):  # noqa: N818
+    """Token is missing exception."""
 
 
 class HTTPError(DiscovergyError):
-    """HTTP error"""
+    """HTTP error."""

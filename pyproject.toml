@@ -22,12 +22,12 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.9, <4" # needed by dataclasses-json
+python = ">=3.11"
 authlib = ">=0.15"
 httpx = ">=0.24"
-dataclasses-json = "^0.6.0"
-marshmallow = "^3.19.0"
 pytz = "^2023.3"
+mashumaro = "^3.11"
+orjson = "^3.9.12"
 
 [tool.poetry.group.dev.dependencies]
 codespell = "2.2.6"

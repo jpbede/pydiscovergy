@@ -9,7 +9,6 @@ from pydiscovergy.const import API_BASE
 from pydiscovergy.error import (
     AccessTokenExpired,
     DiscovergyClientError,
-    DiscovergyError,
     HTTPError,
     InvalidLogin,
 )
@@ -17,10 +16,11 @@ from pydiscovergy.models import Reading, Statistic
 from tests import load_fixture
 
 
-@pytest.mark.asyncio
 @pytest.mark.respx(base_url=API_BASE)
 async def test_get_timeout(
-    respx_mock, discovergy_mock: Discovergy, httpx_mock: HTTPXMock
+    respx_mock,
+    discovergy_mock: Discovergy,
+    httpx_mock: HTTPXMock,
 ) -> None:
     httpx_mock.add_exception(httpx.ReadTimeout("Unable to read within timeout"))
 
@@ -29,10 +29,10 @@ async def test_get_timeout(
         await discovergy_mock._get("/test")
 
 
-@pytest.mark.asyncio
 @pytest.mark.respx(base_url=API_BASE)
 async def test_token_auth_expired(
-    respx_mock, discovergy_token_mock: Discovergy
+    respx_mock,
+    discovergy_token_mock: Discovergy,
 ) -> None:
     respx_mock.get("/test").respond(json={"key": "value"})
 
@@ -42,7 +42,6 @@ async def test_token_auth_expired(
         await discovergy_token_mock._get("/test")
 
 
-@pytest.mark.asyncio
 @pytest.mark.respx(base_url=API_BASE)
 async def test__get(respx_mock, discovergy_mock: Discovergy) -> None:
     mock_req = respx_mock.get("/test").respond(json={"key": "value"})
@@ -50,12 +49,7 @@ async def test__get(respx_mock, discovergy_mock: Discovergy) -> None:
     resp = await discovergy_mock._get("/test")
 
     assert mock_req.called
-    assert resp == {"key": "value"}
-
-    # test if error is raised when there is invalid json
-    with pytest.raises(DiscovergyError):
-        respx_mock.get("/test").respond(content='{"key": "value"')
-        await discovergy_mock._get("/test")
+    assert resp == '{"key": "value"}'
 
     # check if DiscovergyClientError is raised when there was a client error
     with pytest.raises(DiscovergyClientError):
@@ -73,7 +67,6 @@ async def test__get(respx_mock, discovergy_mock: Discovergy) -> None:
         await discovergy_mock._get("/test")
 
 
-@pytest.mark.asyncio
 @pytest.mark.respx(base_url=API_BASE)
 async def test_meters(respx_mock, discovergy_mock: Discovergy) -> None:
     mock_req = respx_mock.get("/meters").respond(text=load_fixture("meters.json"))
@@ -85,15 +78,15 @@ async def test_meters(respx_mock, discovergy_mock: Discovergy) -> None:
     assert meters[0].meter_id == "f8d610b7a8cc4e73939fa33b990ded54"
 
 
-@pytest.mark.asyncio
 @pytest.mark.respx(base_url=API_BASE)
 async def test_meter_last_reading(respx_mock, discovergy_mock: Discovergy) -> None:
     mock_req = respx_mock.get(
-        "/last_reading", params={"meterId": "f8d610b7a8cc4e73939fa33b990ded54"}
+        "/last_reading",
+        params={"meterId": "f8d610b7a8cc4e73939fa33b990ded54"},
     ).respond(text=load_fixture("last_reading.json"))
 
     last_reading = await discovergy_mock.meter_last_reading(
-        "f8d610b7a8cc4e73939fa33b990ded54"
+        "f8d610b7a8cc4e73939fa33b990ded54",
     )
 
     assert mock_req.called
@@ -102,28 +95,29 @@ async def test_meter_last_reading(respx_mock, discovergy_mock: Discovergy) -> No
     assert last_reading.time != 0
 
 
-@pytest.mark.asyncio
 @pytest.mark.respx(base_url=API_BASE)
 async def test_meter_last_reading_empty(
-    respx_mock, discovergy_mock: Discovergy
+    respx_mock,
+    discovergy_mock: Discovergy,
 ) -> None:
     mock_req = respx_mock.get(
-        "/last_reading", params={"meterId": "f8d610b7a8cc4e73939fa33b990ded54"}
+        "/last_reading",
+        params={"meterId": "f8d610b7a8cc4e73939fa33b990ded54"},
     ).respond(text="")
 
     last_reading = await discovergy_mock.meter_last_reading(
-        "f8d610b7a8cc4e73939fa33b990ded54"
+        "f8d610b7a8cc4e73939fa33b990ded54",
     )
 
     assert mock_req.called
     assert isinstance(last_reading, Reading)
 
 
-@pytest.mark.asyncio
 @pytest.mark.respx(base_url=API_BASE)
 async def test_meter_devices(respx_mock, discovergy_mock: Discovergy) -> None:
     mock_req = respx_mock.get(
-        "/devices", params={"meterId": "f8d610b7a8cc4e73939fa33b990ded54"}
+        "/devices",
+        params={"meterId": "f8d610b7a8cc4e73939fa33b990ded54"},
     ).respond(text=load_fixture("devices.json"))
 
     devices = await discovergy_mock.meter_devices("f8d610b7a8cc4e73939fa33b990ded54")
@@ -134,11 +128,11 @@ async def test_meter_devices(respx_mock, discovergy_mock: Discovergy) -> None:
     assert isinstance(devices, list)
 
 
-@pytest.mark.asyncio
 @pytest.mark.respx(base_url=API_BASE)
 async def test_meter_devices_empty(respx_mock, discovergy_mock: Discovergy) -> None:
     mock_req = respx_mock.get(
-        "/devices", params={"meterId": "f8d610b7a8cc4e73939fa33b990ded54"}
+        "/devices",
+        params={"meterId": "f8d610b7a8cc4e73939fa33b990ded54"},
     ).respond(text="")
 
     devices = await discovergy_mock.meter_devices("f8d610b7a8cc4e73939fa33b990ded54")
@@ -149,7 +143,6 @@ async def test_meter_devices_empty(respx_mock, discovergy_mock: Discovergy) -> N
     assert isinstance(devices, list)
 
 
-@pytest.mark.asyncio
 @pytest.mark.respx(base_url=API_BASE)
 async def test_meter_readings(respx_mock, discovergy_mock: Discovergy) -> None:
     params = {
@@ -160,7 +153,7 @@ async def test_meter_readings(respx_mock, discovergy_mock: Discovergy) -> None:
     }
 
     mock_req = respx_mock.get("/readings", params=params).respond(
-        text=load_fixture("readings.json")
+        text=load_fixture("readings.json"),
     )
 
     readings = await discovergy_mock.meter_readings(
@@ -174,7 +167,6 @@ async def test_meter_readings(respx_mock, discovergy_mock: Discovergy) -> None:
     assert isinstance(readings[0], Reading)
 
 
-@pytest.mark.asyncio
 @pytest.mark.respx(base_url=API_BASE)
 async def test_meter_field_names(respx_mock, discovergy_mock: Discovergy) -> None:
     params = {
@@ -182,11 +174,11 @@ async def test_meter_field_names(respx_mock, discovergy_mock: Discovergy) -> Non
     }
 
     mock_req = respx_mock.get("/field_names", params=params).respond(
-        text=load_fixture("field_names.json")
+        text=load_fixture("field_names.json"),
     )
 
     field_names = await discovergy_mock.meter_field_names(
-        "f8d610b7a8cc4e73939fa33b990ded54"
+        "f8d610b7a8cc4e73939fa33b990ded54",
     )
 
     assert mock_req.called == 1
@@ -194,7 +186,6 @@ async def test_meter_field_names(respx_mock, discovergy_mock: Discovergy) -> Non
     assert isinstance(field_names, list)
 
 
-@pytest.mark.asyncio
 @pytest.mark.respx(base_url=API_BASE)
 async def test_meter_statistics(respx_mock, discovergy_mock: Discovergy) -> None:
     params = {
@@ -203,7 +194,7 @@ async def test_meter_statistics(respx_mock, discovergy_mock: Discovergy) -> None
     }
 
     mock_req = respx_mock.get("/statistics", params=params).respond(
-        text=load_fixture("statistics.json")
+        text=load_fixture("statistics.json"),
     )
 
     statistics = await discovergy_mock.meter_statistics(

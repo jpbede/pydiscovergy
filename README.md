@@ -126,7 +126,7 @@ SOFTWARE.
 
 [build-shield]: https://github.com/jpbede/pydiscovergy/actions/workflows/release.yml/badge.svg
 [build]: https://github.com/jpbede/pydiscovergy/actions
-[codecov-shield]: https://codecov.io/gh/jpbede/pydiscovergy/branch/master/graph/badge.svg
+[codecov-shield]: https://codecov.io/gh/jpbede/pydiscovergy/branch/main/graph/badge.svg
 [codecov]: https://codecov.io/gh/jpbede/pydiscovergy
 [commits-shield]: https://img.shields.io/github/commit-activity/y/jpbede/pydiscovergy.svg
 [commits]: https://github.com/jpbede/pydiscovergy/commits/main

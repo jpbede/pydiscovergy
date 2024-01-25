@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from httpx import AsyncClient
-from httpx import BasicAuth as HttpxBasicAuth
+from httpx import AsyncClient, BasicAuth as HttpxBasicAuth
 
 from .base import BaseAuthentication
 
 
+# pylint: disable=too-few-public-methods
 class BasicAuth(BaseAuthentication):
     """Authentication module for basic auth."""
 
@@ -18,8 +18,7 @@ class BasicAuth(BaseAuthentication):
         timeout: int,
         httpx_client: AsyncClient | None = None,
     ) -> AsyncClient:
-        """Returns a httpx client with basic authentication."""
-
+        """Return a httpx client with basic authentication."""
         if not httpx_client:
             httpx_client = AsyncClient(timeout=timeout)
 

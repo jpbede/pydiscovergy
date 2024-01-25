@@ -1,8 +1,11 @@
 """Models for Discovergy API."""
+from __future__ import annotations
+
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any, Self
 
+from mashumaro.config import BaseConfig
 from mashumaro.mixins.orjson import DataClassORJSONMixin
 from mashumaro.types import SerializationStrategy
 import pytz
@@ -17,7 +20,7 @@ class MillisecondTimestampStrategy(SerializationStrategy, use_annotations=True):
 
     def deserialize(self, value: float) -> datetime:
         """Deserialize an timestamp to a datetime."""
-        return datetime.fromtimestamp(value / 1000)
+        return datetime.fromtimestamp(value / 1000, tz=UTC)
 
 
 @dataclass(frozen=True, slots=True)
@@ -40,10 +43,14 @@ class Reading(DataClassORJSONMixin):
 
     @property
     def time_with_timezone(self) -> datetime:
+        """Return the time with timezone."""
         return pytz.timezone("UTC").localize(self.time)
 
-    class Config:
-        serialization_strategy = {
+    # pylint: disable=too-few-public-methods
+    class Config(BaseConfig):
+        """Configuration for mashumaro."""
+
+        serialization_strategy = {  # noqa: RUF012
             datetime: MillisecondTimestampStrategy(),
         }
 
@@ -66,7 +73,7 @@ class Meter:
     meter_id: str = field(metadata={"alias": "meterId"})
     serial_number: str = field(metadata={"alias": "serialNumber"})
     full_serial_number: str = field(metadata={"alias": "fullSerialNumber"})
-    type: str
+    meter_type: str = field(metadata={"alias": "type"})
     measurement_type: str = field(metadata={"alias": "measurementType"})
     load_profile_type: str = field(metadata={"alias": "loadProfileType"})
     location: Location

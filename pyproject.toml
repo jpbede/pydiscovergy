@@ -120,6 +120,9 @@ disable = [
   "too-many-arguments",
   "too-many-public-methods",
   "wrong-import-order",
+
+  # disabled temporarily
+  "protected-access",
 ]
 
 [tool.pylint.SIMILARITIES]
@@ -143,6 +146,10 @@ ignore = [
   "PLR2004", # Just annoying, not really useful
   "PLR0913", # Too many arguments
   "TCH001",
+
+  # conflicts with formatter
+  "COM812",
+  "ISC001",
 ]
 select = ["ALL"]
 

@@ -1,7 +1,9 @@
+"""Tests for the token authentication module."""
 import httpx
 import pytest
+from respx import MockRouter
 
-from pydiscovergy.authentication import ConsumerToken, RequestToken
+from pydiscovergy.authentication import ConsumerToken, RequestToken, TokenAuth
 from pydiscovergy.const import API_BASE
 from pydiscovergy.error import (
     DiscovergyClientError,
@@ -12,11 +14,13 @@ from pydiscovergy.error import (
 )
 
 
-@pytest.mark.asyncio
 @pytest.mark.respx(base_url=API_BASE)
-async def test_fetch_consumer_token(respx_mock, tokenauth_mock) -> None:
+async def test_fetch_consumer_token(
+    respx_mock: MockRouter, tokenauth_mock: TokenAuth
+) -> None:
+    """Test if a consumer token is fetched."""
     mock_req = respx_mock.post("/oauth1/consumer_token").respond(
-        json={"key": "key123", "secret": "secret123"}
+        json={"key": "key123", "secret": "secret123"},
     )
 
     consumer_token = await tokenauth_mock._fetch_consumer_token()
@@ -28,14 +32,14 @@ async def test_fetch_consumer_token(respx_mock, tokenauth_mock) -> None:
     # test if error is raised when there is invalid json
     with pytest.raises(DiscovergyError):
         respx_mock.post("/oauth1/consumer_token").respond(
-            content='{"key": "key123", "secret": "secret123"'
+            content='{"key": "key123", "secret": "secret123"',
         )
         await tokenauth_mock._fetch_consumer_token()
 
     # test when httpx.RequestError is raised
     with pytest.raises(DiscovergyClientError):
         mock_req2 = respx_mock.post("/oauth1/consumer_token").mock(
-            side_effect=httpx.RequestError
+            side_effect=httpx.RequestError,
         )
         await tokenauth_mock._fetch_consumer_token()
 
@@ -49,11 +53,13 @@ async def test_fetch_consumer_token(respx_mock, tokenauth_mock) -> None:
     assert mock_req3.called
 
 
-@pytest.mark.asyncio
 @pytest.mark.respx(base_url=API_BASE)
-async def test_fetch_request_token(respx_mock, tokenauth_mock) -> None:
+async def test_fetch_request_token(
+    respx_mock: MockRouter, tokenauth_mock: TokenAuth
+) -> None:
+    """Test if a request token is fetched."""
     mock_req = respx_mock.post("/oauth1/request_token").respond(
-        json={"oauth_token": "key123", "oauth_token_secret": "secret123"}
+        json={"oauth_token": "key123", "oauth_token_secret": "secret123"},
     )
 
     request_token = await tokenauth_mock._fetch_request_token()
@@ -65,7 +71,7 @@ async def test_fetch_request_token(respx_mock, tokenauth_mock) -> None:
     # test when httpx.RequestError is raised
     with pytest.raises(HTTPError):
         mock_req2 = respx_mock.post("/oauth1/request_token").mock(
-            side_effect=httpx.RequestError
+            side_effect=httpx.RequestError,
         )
         await tokenauth_mock._fetch_request_token()
 
@@ -79,15 +85,19 @@ async def test_fetch_request_token(respx_mock, tokenauth_mock) -> None:
     assert mock_req3.called
 
 
-@pytest.mark.asyncio
 @pytest.mark.respx(base_url=API_BASE)
-async def test_authorize_request_token(respx_mock, tokenauth_mock) -> None:
+async def test_authorize_request_token(
+    respx_mock: MockRouter, tokenauth_mock: TokenAuth
+) -> None:
+    """Test if the request token is authorized.""" ""
     mock_req = respx_mock.get("/oauth1/authorize").respond(
-        content="oauth_verifier=i-am-a-verifier-string"
+        content="oauth_verifier=i-am-a-verifier-string",
     )
 
     response = await tokenauth_mock._authorize_request_token(
-        "test@example.com", "test123", "request_token"
+        "test@example.com",
+        "test123",
+        "request_token",
     )
 
     assert mock_req.called
@@ -96,10 +106,12 @@ async def test_authorize_request_token(respx_mock, tokenauth_mock) -> None:
     # test when httpx.RequestError is raised
     with pytest.raises(DiscovergyClientError):
         mock_req2 = respx_mock.get("/oauth1/authorize").mock(
-            side_effect=httpx.RequestError
+            side_effect=httpx.RequestError,
         )
         await tokenauth_mock._authorize_request_token(
-            "test@example.com", "test123", "request_token"
+            "test@example.com",
+            "test123",
+            "request_token",
         )
 
     assert mock_req2.called
@@ -108,7 +120,9 @@ async def test_authorize_request_token(respx_mock, tokenauth_mock) -> None:
     with pytest.raises(InvalidLogin):
         mock_req3 = respx_mock.get("/oauth1/authorize").respond(status_code=403)
         await tokenauth_mock._authorize_request_token(
-            "test@example.com", "test123", "request_token"
+            "test@example.com",
+            "test123",
+            "request_token",
         )
 
     assert mock_req3.called
@@ -117,24 +131,30 @@ async def test_authorize_request_token(respx_mock, tokenauth_mock) -> None:
     with pytest.raises(HTTPError):
         mock_req3 = respx_mock.get("/oauth1/authorize").respond(status_code=401)
         await tokenauth_mock._authorize_request_token(
-            "test@example.com", "test123", "request_token"
+            "test@example.com",
+            "test123",
+            "request_token",
         )
 
     assert mock_req3.called
 
 
-@pytest.mark.asyncio
 @pytest.mark.respx(base_url=API_BASE)
-async def test_fetch_access_token(respx_mock, tokenauth_mock) -> None:
+async def test_fetch_access_token(
+    respx_mock: MockRouter, tokenauth_mock: TokenAuth
+) -> None:
+    """Test if an access token is fetched."""
     mock_req = respx_mock.post("/oauth1/access_token").respond(
         json={
             "oauth_token": "access_token",
             "oauth_token_secret": "access_token_secret",
-        }
+        },
     )
 
     response = await tokenauth_mock._fetch_access_token(
-        "request_token", "request_token_secret", "i-am-a-verifier"
+        "request_token",
+        "request_token_secret",
+        "i-am-a-verifier",
     )
 
     assert mock_req.called
@@ -144,23 +164,25 @@ async def test_fetch_access_token(respx_mock, tokenauth_mock) -> None:
     with pytest.raises(HTTPError):
         mock_req2 = respx_mock.post("/oauth1/access_token").respond(status_code=401)
         await tokenauth_mock._fetch_access_token(
-            "request_token", "request_token_secret", "i-am-a-verifier"
+            "request_token",
+            "request_token_secret",
+            "i-am-a-verifier",
         )
 
     assert mock_req2.called
 
 
-@pytest.mark.asyncio
-async def test_missing_consumer_token(tokenauth_mock) -> None:
-    tokenauth_mock.consumer_token = None
+async def test_missing_consumer_token(tokenauth_mock: TokenAuth) -> None:
+    """Test if MissingToken is raised when consumer token is missing."""
+    tokenauth_mock.consumer_token = None  # type: ignore[assignment]
 
     with pytest.raises(MissingToken):
         tokenauth_mock._get_oauth_client_params()
 
 
-@pytest.mark.asyncio
-async def test_missing_access_token(tokenauth_mock) -> None:
-    tokenauth_mock.access_token = None
+async def test_missing_access_token(tokenauth_mock: TokenAuth) -> None:
+    """Test if MissingToken is raised when access token is missing."""
+    tokenauth_mock.access_token = None  # type: ignore[assignment]
 
     with pytest.raises(MissingToken):
         tokenauth_mock._get_oauth_client_params()

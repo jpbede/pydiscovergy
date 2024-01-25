@@ -12,4 +12,7 @@ extend-ignore = [
   "SLF001", # Tests will access private/protected members...
   "TCH002", # pytest doesn't like this one...
   "PLR0913", # we're overwriting function that has many arguments
+
+    # temporarily disabled
+  "PT012",
 ]

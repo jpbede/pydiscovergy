@@ -1,9 +1,12 @@
 """Base authentication module for Discovergy API."""
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 
-from httpx import AsyncClient
+from httpx import AsyncClient  # noqa: TCH002
 
 
+# pylint: disable=too-few-public-methods
 class BaseAuthentication(ABC):
     """Interface class for authentication classes."""
 
@@ -15,4 +18,4 @@ class BaseAuthentication(ABC):
         timeout: int,
         httpx_client: AsyncClient | None = None,
     ) -> AsyncClient:
-        """Function that needed to be implemented by authentication modules."""
+        """Return httpx AsyncClient for the pydiscovergy client."""

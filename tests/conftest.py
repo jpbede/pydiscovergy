@@ -1,3 +1,6 @@
+"""Fixtures for tests."""
+from typing import Generator
+
 import pytest
 import respx
 
@@ -12,45 +15,47 @@ from pydiscovergy.const import (
 
 
 @pytest.fixture
-def mocked_login():
+def mocked_login() -> Generator[respx.MockRouter, None, None]:
+    """Mock login."""
     with respx.mock(assert_all_called=False) as respx_mock:
         respx_mock.post(url=API_CONSUMER_TOKEN, name="consumer_token").respond(
-            json={"key": "m_consumer_token", "secret": "m_consumer_token_secret"}
+            json={"key": "m_consumer_token", "secret": "m_consumer_token_secret"},
         )
 
         respx_mock.post(API_REQUEST_TOKEN).respond(
             json={
                 "oauth_token": "m_request_token",
                 "oauth_token_secret": "m_request_token_secret",
-            }
+            },
         )
 
         respx_mock.get(API_AUTHORIZATION).respond(
-            content="oauth_verifier=m_i-am-a-verifier-string"
+            content="oauth_verifier=m_i-am-a-verifier-string",
         )
 
         respx_mock.post(API_ACCESS_TOKEN).respond(
             json={
                 "oauth_token": "m_access_token",
                 "oauth_token_secret": "m_access_token_secret",
-            }
+            },
         )
 
         yield respx_mock
 
 
 @pytest.fixture
-def discovergy_mock():
-    instance = pydiscovergy.Discovergy(
+def discovergy_mock() -> pydiscovergy.Discovergy:
+    """Return a Discovergy instance."""
+    return pydiscovergy.Discovergy(
         email="example@example.com",
         password="example",
     )
-    yield instance
 
 
 @pytest.fixture
-def discovergy_token_mock():
-    instance = pydiscovergy.Discovergy(
+def discovergy_token_mock() -> pydiscovergy.Discovergy:
+    """Return a Discovergy instance with token auth."""
+    return pydiscovergy.Discovergy(
         email="example@example.com",
         password="example",
         authentication=TokenAuth(
@@ -58,13 +63,12 @@ def discovergy_token_mock():
             access_token=AccessToken("access_token", "access_token_secret"),
         ),
     )
-    yield instance
 
 
 @pytest.fixture
-def tokenauth_mock():
-    instance = TokenAuth(
+def tokenauth_mock() -> TokenAuth:
+    """Return a TokenAuth instance."""
+    return TokenAuth(
         consumer_token=ConsumerToken("key123", "secret123"),
         access_token=AccessToken("access_token", "access_token_secret"),
     )
-    yield instance

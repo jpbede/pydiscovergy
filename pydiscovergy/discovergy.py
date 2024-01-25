@@ -81,8 +81,8 @@ class Discovergy:
             return MetersResponse.from_json(response).meters
         return []
 
-    async def meter_last_reading(self, meter_id: str) -> Reading:
-        """Get last reading for meter"""
+    async def meter_last_reading(self, *, meter_id: str) -> Reading:
+        """Get last reading for meter."""
         response = await self._get("/last_reading", params={"meterId": meter_id})
         if response is not None:
             return Reading.from_json(response)
@@ -91,6 +91,7 @@ class Discovergy:
 
     async def meter_readings(
         self,
+        *,
         meter_id: str,
         start_time: datetime,
         end_time: datetime | None = None,
@@ -130,14 +131,14 @@ class Discovergy:
             return ORJSONDecoder(list[Reading]).decode(response)
         return []
 
-    async def meter_field_names(self, meter_id: str) -> list[str]:
+    async def meter_field_names(self, *, meter_id: str) -> list[str]:
         """Return all available measurement field names for the specified meter."""
         field_names = await self._get("/field_names", params={"meterId": meter_id})
         if field_names is not None:
             return ORJSONDecoder(list[str]).decode(field_names)
         return []
 
-    async def meter_devices(self, meter_id: str) -> list[str]:
+    async def meter_devices(self, *, meter_id: str) -> list[str]:
         """Return all recognized devices by meter id."""
         devices = await self._get("/devices", params={"meterId": meter_id})
         if devices is not None:
@@ -146,6 +147,7 @@ class Discovergy:
 
     async def meter_statistics(
         self,
+        *,
         meter_id: str,
         start_time: datetime,
         end_time: datetime | None = None,

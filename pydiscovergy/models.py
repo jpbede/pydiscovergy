@@ -84,7 +84,7 @@ class Meter:
         cls: type[Self],
         d: dict[Any, Any],
     ) -> dict[Any, Any]:
-        """Raise when response was unexpected."""
+        """Move additional fields to a separate dict."""
         non_additional = {
             "meterId",
             "serialNumber",
@@ -111,5 +111,5 @@ class MetersResponse(DataClassORJSONMixin):
         cls: type[Self],
         d: dict[Any, Any],
     ) -> dict[Any, Any]:
-        """Raise when response was unexpected."""
+        """Wrap meters in a dict for deserialization."""
         return {"meters": d}

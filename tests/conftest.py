@@ -1,5 +1,5 @@
 """Fixtures for tests."""
-from typing import Generator
+from collections.abc import Generator
 
 import pytest
 import respx

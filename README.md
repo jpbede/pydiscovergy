@@ -34,7 +34,7 @@ async def main():
 
     for meter in meters:
         if meter.meter_id == "abc123":
-            reading = await discovergy.meter_last_reading(meter.meter_id)
+            reading = await discovergy.meter_last_reading(meter_id=meter.meter_id)
             print(f"Last reading: {reading.values['energy']} kWh")
 
 if __name__ == "__main__":

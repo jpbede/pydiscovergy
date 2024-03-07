@@ -1,4 +1,5 @@
 """Tests for the token authentication module."""
+
 import httpx
 import pytest
 from respx import MockRouter

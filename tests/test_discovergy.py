@@ -1,4 +1,5 @@
 """Tests for the Discovergy API client."""
+
 import datetime
 
 import httpx

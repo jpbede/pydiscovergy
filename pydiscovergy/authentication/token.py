@@ -1,4 +1,5 @@
 """Authentication module for token auth."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

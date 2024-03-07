@@ -1,4 +1,5 @@
 """Discovergy constants."""
+
 from enum import StrEnum
 
 DEFAULT_APP_NAME = "pydicovergy"

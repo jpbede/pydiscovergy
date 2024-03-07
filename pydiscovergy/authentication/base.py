@@ -1,4 +1,5 @@
 """Base authentication module for Discovergy API."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod

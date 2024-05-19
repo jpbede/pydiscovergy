@@ -159,7 +159,7 @@ class TokenAuth(BaseAuthentication):
                     oauth_token_response.get("oauth_token"),
                     oauth_token_response.get("oauth_token_secret"),
                 )
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 msg = f"Request failed: {exc}"
                 raise HTTPError(msg) from exc
 
@@ -219,6 +219,6 @@ class TokenAuth(BaseAuthentication):
                     access_token_response.get("oauth_token"),
                     access_token_response.get("oauth_token_secret"),
                 )
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 msg = f"Request failed: {exc}"
                 raise HTTPError(msg) from exc

@@ -9,11 +9,11 @@
 [![Build Status][build-shield]][build]
 [![Code Coverage][codecov-shield]][codecov]
 
-Asynchronous Python client for Discovergy smart meter using their API.
+Asynchronous Python client for inexogy (former Discovergy) smart meter using their API.
 
 ## About
 
-This package allows you to fetch data from api.discovergy.com.
+This package allows you to fetch data from api.inexogy.com.
 
 ## Installation
 

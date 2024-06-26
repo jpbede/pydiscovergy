@@ -1099,13 +1099,13 @@ windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
 name = "pylint"
-version = "3.2.3"
+version = "3.2.4"
 description = "python code static checker"
 optional = false
 python-versions = ">=3.8.0"
 files = [
-    {file = "pylint-3.2.3-py3-none-any.whl", hash = "sha256:b3d7d2708a3e04b4679e02d99e72329a8b7ee8afb8d04110682278781f889fa8"},
-    {file = "pylint-3.2.3.tar.gz", hash = "sha256:02f6c562b215582386068d52a30f520d84fdbcf2a95fc7e855b816060d048b60"},
+    {file = "pylint-3.2.4-py3-none-any.whl", hash = "sha256:43b8ffdf1578e4e4439fa1f6ace402281f5dd61999192280fa12fe411bef2999"},
+    {file = "pylint-3.2.4.tar.gz", hash = "sha256:5753d27e49a658b12a48c2883452751a2ecfc7f38594e0980beb03a6e77e6f86"},
 ]
 
 [package.dependencies]
@@ -1621,4 +1621,4 @@ dev = ["doc8", "flake8", "flake8-import-order", "rstcheck[sphinx]", "sphinx"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "e8cbf1386e86f7b4231ec6de55fb653e093c58937c1ac9dc2549a724d2730513"
+content-hash = "0a7a326d543358c452edafcd9fe874579e2ff68fc5bbece8bcb411d855706fef"

@@ -43,7 +43,7 @@ respx = "0.21.1"
 pytest-httpx = "0.30.0"
 mypy = "1.10.1"
 ruff = "0.5.0"
-safety = "3.2.3"
+safety = "3.2.4"
 yamllint = "1.35.1"
 types-pytz = "^2023.3.1.1"
 

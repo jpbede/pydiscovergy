@@ -25,7 +25,6 @@ classifiers = [
 python = "^3.11"
 authlib = ">=0.15"
 httpx = ">=0.24"
-pytz = ">=2023.3"
 mashumaro = ">=3.11"
 orjson = ">=3.9.0"
 
@@ -45,7 +44,6 @@ mypy = "1.11.2"
 ruff = "0.6.2"
 safety = "3.2.6"
 yamllint = "1.35.1"
-types-pytz = "^2023.3.1.1"
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/jpbede/pydiscovergy/issues"

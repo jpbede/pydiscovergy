@@ -9,7 +9,6 @@ from typing import Any, Self
 from mashumaro.config import BaseConfig
 from mashumaro.mixins.orjson import DataClassORJSONMixin
 from mashumaro.types import SerializationStrategy
-import pytz
 
 
 class MillisecondTimestampStrategy(SerializationStrategy, use_annotations=True):
@@ -45,7 +44,7 @@ class Reading(DataClassORJSONMixin):
     @property
     def time_with_timezone(self) -> datetime:
         """Return the time with timezone."""
-        return pytz.timezone("UTC").localize(self.time)
+        return self.time.replace(tzinfo=UTC)
 
     # pylint: disable=too-few-public-methods
     class Config(BaseConfig):

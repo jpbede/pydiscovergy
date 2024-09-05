@@ -42,7 +42,7 @@ respx = "0.21.1"
 pytest-httpx = "0.30.0"
 mypy = "1.11.2"
 ruff = "0.6.4"
-safety = "3.2.6"
+safety = "3.2.7"
 yamllint = "1.35.1"
 
 [tool.poetry.urls]

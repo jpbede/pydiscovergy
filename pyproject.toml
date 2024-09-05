@@ -147,6 +147,7 @@ ignore = [
   "PLR2004", # Just annoying, not really useful
   "PLR0913", # Too many arguments
   "TCH001",
+  "ASYNC109",
 
   # conflicts with formatter
   "COM812",

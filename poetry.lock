@@ -1270,21 +1270,21 @@ testing = ["fields", "hunter", "process-tests", "pytest-xdist", "virtualenv"]
 
 [[package]]
 name = "pytest-httpx"
-version = "0.30.0"
+version = "0.31.0"
 description = "Send responses to httpx."
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "pytest-httpx-0.30.0.tar.gz", hash = "sha256:755b8edca87c974dd4f3605c374fda11db84631de3d163b99c0df5807023a19a"},
-    {file = "pytest_httpx-0.30.0-py3-none-any.whl", hash = "sha256:6d47849691faf11d2532565d0c8e0e02b9f4ee730da31687feae315581d7520c"},
+    {file = "pytest_httpx-0.31.0-py3-none-any.whl", hash = "sha256:9ca001951fe7a08e7b08674c05904e0f148b4df28849a721f33a9ed404810e7b"},
+    {file = "pytest_httpx-0.31.0.tar.gz", hash = "sha256:bfe133be94ec5b46b44233d3644d97f15d33660c91e94ac4b11d12d77795eb54"},
 ]
 
 [package.dependencies]
 httpx = "==0.27.*"
-pytest = ">=7,<9"
+pytest = "==8.*"
 
 [package.extras]
-testing = ["pytest-asyncio (==0.23.*)", "pytest-cov (==4.*)"]
+testing = ["pytest-asyncio (==0.24.*)", "pytest-cov (==5.*)"]
 
 [[package]]
 name = "pyyaml"
@@ -1697,4 +1697,4 @@ dev = ["doc8", "flake8", "flake8-import-order", "rstcheck[sphinx]", "sphinx"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "e7763b65525a2601019343757855e2f29133ea6142c3de6c31652094cb7fc35e"
+content-hash = "22588440f0ee12680fc4cd89d0142d3d1c75af3243663c076049d531e0b8f782"

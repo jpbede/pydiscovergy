@@ -1270,13 +1270,13 @@ testing = ["fields", "hunter", "process-tests", "pytest-xdist", "virtualenv"]
 
 [[package]]
 name = "pytest-httpx"
-version = "0.31.0"
+version = "0.31.1"
 description = "Send responses to httpx."
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "pytest_httpx-0.31.0-py3-none-any.whl", hash = "sha256:9ca001951fe7a08e7b08674c05904e0f148b4df28849a721f33a9ed404810e7b"},
-    {file = "pytest_httpx-0.31.0.tar.gz", hash = "sha256:bfe133be94ec5b46b44233d3644d97f15d33660c91e94ac4b11d12d77795eb54"},
+    {file = "pytest_httpx-0.31.1-py3-none-any.whl", hash = "sha256:a54699123c5149c456d8ef7b9844075566f6e74050b3af71700aba94c7b62ef0"},
+    {file = "pytest_httpx-0.31.1.tar.gz", hash = "sha256:f90399e83988ab511444eb1a95a3ca8a98cde04e64b530070bc560cee0258340"},
 ]
 
 [package.dependencies]
@@ -1697,4 +1697,4 @@ dev = ["doc8", "flake8", "flake8-import-order", "rstcheck[sphinx]", "sphinx"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "05c1a0e16d8210c65bc151098138301923941360ea25bb1ece6a581febd8986c"
+content-hash = "afb3ebb7ae7d504e66dd1edd754b1dae43db37951bebbe92c82b4eb357572d47"

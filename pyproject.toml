@@ -41,7 +41,7 @@ pytest-cov = "6.0.0"
 respx = "0.21.1"
 pytest-httpx = "0.33.0"
 mypy = "1.13.0"
-ruff = "0.7.1"
+ruff = "0.7.2"
 safety = "3.2.10"
 yamllint = "1.35.1"
 

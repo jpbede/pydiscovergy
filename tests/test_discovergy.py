@@ -55,7 +55,7 @@ async def test__get(respx_mock: MockRouter, discovergy_mock: Discovergy) -> None
     resp = await discovergy_mock._get("/test")
 
     assert mock_req.called
-    assert resp == '{"key": "value"}'
+    assert resp == '{"key":"value"}'
 
     # check if DiscovergyClientError is raised when there was a client error
     with pytest.raises(DiscovergyClientError):

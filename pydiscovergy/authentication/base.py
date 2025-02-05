@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from httpx import AsyncClient  # noqa: TCH002
+from httpx import AsyncClient  # noqa: TC002
 
 
 # pylint: disable=too-few-public-methods
